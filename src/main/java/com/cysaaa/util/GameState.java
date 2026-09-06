@@ -1,0 +1,26 @@
+package com.cysaaa.util;
+
+public enum GameState {
+    MAIN_MENU,
+    CORRECT_ANSWER,
+    WRONG_ANSWER,
+    GAME_OVER,
+    HOST_1,
+    HOST_2,
+    HOST_3,
+    QUESTION_1,
+    QUESTION_2,
+    QUESTION_3,
+    QUESTION_4,
+    QUESTION_5,
+    QUESTION_6,
+    QUESTION_7,
+    QUESTION_8,
+    QUESTION_9,
+    QUESTION_10,
+    QUESTION_11,
+    QUESTION_12,
+    QUESTION_13,
+    QUESTION_14,
+    QUESTION_15,
+}
