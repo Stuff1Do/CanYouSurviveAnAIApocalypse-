@@ -1,6 +1,6 @@
 # Can You Survive an AI Apocalypse?
 
-A quiz game built for CMSC 170 (Introduction to Artificial Intelligence). Answer AI-related questions across increasing difficulty tiers to survive.
+Project for CMSC 170 (Introduction to Artificial Intelligence). Inspired by "Who wants to be a Millionare?", answer AI-related questions across increasing difficulty tiers as you slowly transform into AI to survive.
 
 ## Tech Stack
 
