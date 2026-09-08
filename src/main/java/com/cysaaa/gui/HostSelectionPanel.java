@@ -4,6 +4,8 @@ import java.awt.CardLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
+import com.cysaaa.util.Host;
+import com.cysaaa.util.GameState;
 
 public class HostSelectionPanel extends BackgroundPanel {
 
@@ -22,8 +24,9 @@ public class HostSelectionPanel extends BackgroundPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 System.out.println("Host 1 selected!");
-                // e.g. cardLayout.show(cardContainer, "GAMEPLAY");
-                // store selected host somewhere before switching
+                StateManager.getInstance().setCurrentHost(Host.HOST_1);
+                StateManager.getInstance().setScreenState(GameState.PLAYING);
+                //cardLayout.show(cardContainer, "GAMEPLAY");
             }
         });
 
@@ -32,9 +35,9 @@ public class HostSelectionPanel extends BackgroundPanel {
         host2.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Host 2 selected!");
-                // e.g. cardLayout.show(cardContainer, "GAMEPLAY");
-                // store selected host somewhere before switching
+                StateManager.getInstance().setCurrentHost(Host.HOST_2);
+                StateManager.getInstance().setScreenState(GameState.PLAYING);
+                //cardLayout.show(cardContainer, "GAMEPLAY");
             }
         });
 
@@ -44,8 +47,9 @@ public class HostSelectionPanel extends BackgroundPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 System.out.println("Host 3 selected!");
-                // e.g. cardLayout.show(cardContainer, "GAMEPLAY");
-                // store selected host somewhere before switching
+                StateManager.getInstance().setCurrentHost(Host.HOST_2);
+                StateManager.getInstance().setScreenState(GameState.PLAYING);
+                //cardLayout.show(cardContainer, "GAMEPLAY");
             }
         });
     }

@@ -2,15 +2,16 @@ package com.cysaaa.gui;
 
 import com.cysaaa.util.AnswerState;
 import com.cysaaa.util.GameState;
+import com.cysaaa.util.Host; 
 
 public class StateManager {
     private static StateManager instance;
 
     private GameState screenState = GameState.MAIN_MENU;
-    private GameState currentHost;
     private int currentQuestionNumber = 1;
     private AnswerState lastAnswer = AnswerState.UNANSWERED;
     private GameState withdrawState;
+    private Host currentHost;
 
     private StateManager() {}
 
@@ -29,11 +30,12 @@ public class StateManager {
         screenState = s; 
     }
 
-    public GameState getCurrentHost() { 
-        return currentHost; 
+    public Host getCurrentHost() {
+    return currentHost;
     }
-    public void setCurrentHost(GameState h) {
-         currentHost = h;
+
+    public void setCurrentHost(Host h) {
+        currentHost = h;
     }
 
     public int getCurrentQuestionNumber() {
