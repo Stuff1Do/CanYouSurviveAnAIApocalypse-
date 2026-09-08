@@ -20,8 +20,7 @@ public class MainMenuPanel extends BackgroundPanel {
         playButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Play button clicked!");
-                // logic start here pls wait:(
+                cardLayout.show(cardContainer, "HOST_SELECTION");
             }
         });
 
