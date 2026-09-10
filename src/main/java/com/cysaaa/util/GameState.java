@@ -7,7 +7,4 @@ public enum GameState {
     WITHDRAW,
     GAME_OVER,
     VICTORY,
-    HOST_1,
-    HOST_2,
-    HOST_3
 }

@@ -5,10 +5,11 @@ import java.util.Scanner;
 import com.cysaaa.gui.StateManager;
 import com.cysaaa.util.AnswerState;
 import com.cysaaa.util.GameState;
+import com.cysaaa.util.Host; 
 
 public class TApp {
     Scanner scanner = new Scanner(System.in);
-    GameState selectedHost;
+    Host selectedHost;
 
     public void run(){
         System.out.println("========WHO WANTS TO SURVIVE AN AI APOCALYPSE?========");
@@ -41,24 +42,22 @@ public class TApp {
 
             switch (hostChoice) {
                 case 1: 
-                        StateManager.getInstance().setCurrentHost(GameState.HOST_1);
+                        StateManager.getInstance().setCurrentHost(Host.HOST_1);
                         loop = false;
                         break;
                 case 2: 
-                        StateManager.getInstance().setCurrentHost(GameState.HOST_2);
+                        StateManager.getInstance().setCurrentHost(Host.HOST_2);
                         loop = false;
                         break;
                 case 3: 
-                        StateManager.getInstance().setCurrentHost(GameState.HOST_3);
+                        StateManager.getInstance().setCurrentHost(Host.HOST_3);
                         loop = false;
                         break;
                 default: System.out.println("Invalid choice.");
-        
             }
         }
         selectedHost = StateManager.getInstance().getCurrentHost();
         System.out.println("Current state: " + selectedHost);
-        
     }
 
     public void startGame(){
