@@ -6,6 +6,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import com.cysaaa.gui.MainMenuPanel;
+import com.cysaaa.gui.ProgressPanel;
 import com.cysaaa.terminal.TApp;
 import com.cysaaa.gui.HostSelectionPanel;
 import com.cysaaa.gui.InstructionsPanel;
@@ -36,9 +37,13 @@ public class App {
             HostSelectionPanel hostSelectionPanel = new HostSelectionPanel(cardContainer, cardLayout);
             hostSelectionPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
+            ProgressPanel progressPanel = new ProgressPanel(cardContainer, cardLayout);
+            progressPanel.setBounds(0, 0, screenSize.width, screenSize.height);
+
             cardContainer.add(mainMenuPanel, "MENU");
             cardContainer.add(instructionsPanel, "INSTRUCTIONS");
             cardContainer.add(hostSelectionPanel, "HOST_SELECTION");
+            cardContainer.add(progressPanel, "PROGRESS");
 
             frame.setContentPane(cardContainer);
             frame.setVisible(true);

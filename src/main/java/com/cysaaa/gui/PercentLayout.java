@@ -1,4 +1,5 @@
 package com.cysaaa.gui;
+
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +47,13 @@ public class PercentLayout implements LayoutManager2 {
         );
         constraints.put(comp, r);
         parent.add(comp);
+    }
+
+    // Helper: add a component centered in the design canvas, given its pixel width/height
+    public void addPixelCentered(Container parent, Component comp, int w, int h) {
+        int x = (designWidth - w) / 2;
+        int y = (designHeight - h) / 2;
+        addPixel(parent, comp, x, y, w, h);
     }
 
     @Override

@@ -15,6 +15,14 @@ public class ImagePanel extends JPanel {
     private BufferedImage hoverImage;
     private boolean hovering = false;
 
+    // Minimum alpha value (0-255) for a pixel to count as "clickable".
+    // Pixels with alpha at or below this are treated as transparent/empty space.
+    private static final int ALPHA_THRESHOLD = 10;
+
+    // Set to true to make mouse events only register on non-transparent pixels
+    // of the image, instead of the full rectangular bounds.
+    private boolean pixelPreciseHitTest = false;
+
     // Use this constructor if you don't need a hover state
     public ImagePanel(String imagePath) {
         this(imagePath, null);
@@ -34,7 +42,7 @@ public class ImagePanel extends JPanel {
             e.printStackTrace();
         }
 
-        setOpaque(false);
+        setOpaque(false); // transparent parts of the PNG show what's behind it
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -50,6 +58,36 @@ public class ImagePanel extends JPanel {
                 repaint();
             }
         });
+    }
+
+    // Call this to enable shape-accurate (alpha-based) hover/click detection,
+    // so transparent parts of the image no longer respond to mouse events.
+    public void setPixelPreciseHitTest(boolean enabled) {
+        this.pixelPreciseHitTest = enabled;
+    }
+
+    @Override
+    public boolean contains(int x, int y) {
+        if (!pixelPreciseHitTest || image == null) {
+            return super.contains(x, y); // default rectangular hit test
+        }
+
+        if (x < 0 || y < 0 || x >= getWidth() || y >= getHeight()) {
+            return false;
+        }
+
+        // Scale the panel's click coordinates to the image's actual pixel
+        // coordinates, since the image is drawn stretched to the panel's size.
+        int imgX = (int) ((double) x / getWidth() * image.getWidth());
+        int imgY = (int) ((double) y / getHeight() * image.getHeight());
+
+        imgX = Math.min(Math.max(imgX, 0), image.getWidth() - 1);
+        imgY = Math.min(Math.max(imgY, 0), image.getHeight() - 1);
+
+        int pixel = image.getRGB(imgX, imgY);
+        int alpha = (pixel >> 24) & 0xff;
+
+        return alpha > ALPHA_THRESHOLD;
     }
 
     @Override
