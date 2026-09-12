@@ -1,11 +1,14 @@
 package com.cysaaa.terminal;
 
+import java.util.List;
 import java.util.Scanner;
 
 import com.cysaaa.gui.StateManager;
 import com.cysaaa.util.AnswerState;
 import com.cysaaa.util.GameState;
-import com.cysaaa.util.Host; 
+import com.cysaaa.util.Host;
+import com.cysaaa.util.Question;
+import com.cysaaa.util.QuestionLoader; 
 
 public class TApp {
     Scanner scanner = new Scanner(System.in);
@@ -16,7 +19,7 @@ public class TApp {
         System.out.println("1. Play");
         System.out.println("2. Exit");
         System.out.println("Choice: ");
-        int choice = scanner.nextInt();
+        int choice = Integer.parseInt(scanner.nextLine().trim());
 
         if(choice == 1){
             hostSelection();
@@ -38,8 +41,7 @@ public class TApp {
             System.out.println("3. Memory Flush(swap question)");
             System.out.println("Choice: ");
 
-            int hostChoice = scanner.nextInt();
-
+            int hostChoice = Integer.parseInt(scanner.nextLine().trim());
             switch (hostChoice) {
                 case 1: 
                         StateManager.getInstance().setCurrentHost(Host.HOST_1);
@@ -65,7 +67,8 @@ public class TApp {
         StateManager.getInstance().setWithdrawState(GameState.PLAYING);
 
         //load questions and randomize questions here
-        loadQuestions();
+        List<Question> questionList = QuestionLoader.loadQuestions("/data/questions.csv");
+        List<Question> randomizedQuestions = QuestionLoader.randomizeQuestions(questionList);
 
         //gameplay loop
         while (true) {
@@ -73,11 +76,11 @@ public class TApp {
             GameState withdrawState = StateManager.getInstance().getWithdrawState();
             GameState screenState = StateManager.getInstance().getScreenState();
 
-            if (currentQuestionIndex > 15 || withdrawState == GameState.WITHDRAW || screenState == GameState.GAME_OVER) {
+            if (currentQuestionIndex > randomizedQuestions.size() || withdrawState == GameState.WITHDRAW || screenState == GameState.GAME_OVER) {
                 break;
             }
 
-            askQuestion();
+            askQuestion(randomizedQuestions);
 
             // only increment count if the game is still active
             if (StateManager.getInstance().getScreenState() != GameState.GAME_OVER && StateManager.getInstance().getWithdrawState() != GameState.WITHDRAW) {
@@ -93,36 +96,60 @@ public class TApp {
 
     }
 
-    public void askQuestion() {
-        
+    public void askQuestion(List<Question> randomizedQuestions) {
+        int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
         //  ....show question, read player's choice ...
+        Question question = randomizedQuestions.get(currentQuestionIndex - 1);
+        System.out.println("Question #"+currentQuestionIndex+":");
+        System.out.println(question);
+        System.out.println("Enter ('withdraw') to withdraw from the game.");//could have the option to withdraw
+        System.out.println("(DEV) enter 'random' to show all randomized questions");
+        System.out.println("Choice(1-4): ");
+        String choice = scanner.nextLine();
+        if(choice.equals("random")){
+            int i = 0;
+            Question q;
+            while(i < randomizedQuestions.size()){
+                System.out.println("(NUMBER "+(i+1)+")");
+                q = randomizedQuestions.get(i);
+                System.out.println(q);
+                i++;
+            }
+            askQuestion(randomizedQuestions);
+            return;
+        }
 
-
-        //could have the option to withdraw
-
-        int playerChoice = 1; //placeholder
-        boolean correct = checkAnswer(playerChoice); // however we determine this
+        if(choice.equals("withdraw")){
+            StateManager.getInstance().setWithdrawState(GameState.WITHDRAW);
+            return;
+        }
+        boolean correct = checkAnswer(question, choice); 
 
         if (correct) {
             StateManager.getInstance().setLastAnswer(AnswerState.CORRECT);
+            System.out.println("Correct Answer!");
             //DialogueManager.getInstance().trigger(DialogueEvent.CORRECT_ANSWER);
         } else {
             StateManager.getInstance().setLastAnswer(AnswerState.WRONG);
+            System.out.println("Wrong answer.");
             StateManager.getInstance().setScreenState(GameState.GAME_OVER);
             //DialogueManager.getInstance().trigger(DialogueEvent.WRONG_ANSWER);
             
         }
+
     }
 
-    public boolean checkAnswer(int choice){
-
-        return false;
+    public boolean checkAnswer(Question question, String choice) {
+        try {
+            int choiceIndex = Integer.parseInt(choice.trim()) - 1;
+            return question.isCorrect(choiceIndex);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input, counted as wrong.");
+            return false;
+        }
     }
 
-    public void loadQuestions(){
-        //placeholder, eventually will be placed in a general class
-    }
-
+    
     public void checkCheckpoint(){
        
         int progress = StateManager.getInstance().getCurrentQuestionNumber();

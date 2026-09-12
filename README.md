@@ -4,7 +4,7 @@ Project for CMSC 170 (Introduction to Artificial Intelligence). Inspired by "Who
 
 ## Tech Stack
 
-- Java 21
+- Java 21   
 - Swing
 - Maven
 
