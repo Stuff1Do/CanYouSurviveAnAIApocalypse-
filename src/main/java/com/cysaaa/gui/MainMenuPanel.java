@@ -16,7 +16,7 @@ public class MainMenuPanel extends BackgroundPanel {
         setOpaque(false);
 
         ImagePanel playButton = new ImagePanel("/buttons/start_button.png", "/buttons/startHover.png");
-        layout.addPixel(this, playButton, 230, 474, 470, 145);
+        layout.addPixel(this, playButton, 185, 460, 565, 175);
         playButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -25,7 +25,7 @@ public class MainMenuPanel extends BackgroundPanel {
         });
 
         ImagePanel howToPlayButton = new ImagePanel("/buttons/how_to_play.png", "/buttons/htpHover.png");
-        layout.addPixel(this, howToPlayButton, 262, 655, 406, 126);
+        layout.addPixel(this, howToPlayButton, 241, 651, 447, 138);
         howToPlayButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -34,7 +34,7 @@ public class MainMenuPanel extends BackgroundPanel {
         });
 
         ImagePanel exitButton = new ImagePanel("/buttons/exit_button.png", "/buttons/exitHover.png");
-        layout.addPixel(this, exitButton, 263, 799, 406, 126);
+        layout.addPixel(this, exitButton, 265, 800, 406, 126);
         exitButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
