@@ -48,6 +48,6 @@ public class App {
             frame.setContentPane(cardContainer);
             frame.setVisible(true);
         }
-       
+
     }
 }

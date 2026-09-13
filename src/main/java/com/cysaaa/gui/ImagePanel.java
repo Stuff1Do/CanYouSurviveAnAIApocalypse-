@@ -60,6 +60,18 @@ public class ImagePanel extends JPanel {
         });
     }
 
+    // Call this to change the displayed image after construction
+    // (e.g. progress bar frames, lifeline used/unused states, host-specific icons).
+    public void setImage(String imagePath) {
+        try {
+            URL imgUrl = getClass().getResource(imagePath);
+            image = ImageIO.read(imgUrl);
+        } catch (IOException | IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        repaint();
+    }
+
     // Call this to enable shape-accurate (alpha-based) hover/click detection,
     // so transparent parts of the image no longer respond to mouse events.
     public void setPixelPreciseHitTest(boolean enabled) {
