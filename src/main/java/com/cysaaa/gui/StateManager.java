@@ -13,6 +13,10 @@ public class StateManager {
     private GameState withdrawState;
     private Host currentHost;
 
+    private boolean traceEliminationUsed = false;
+    private boolean systemRerouteUsed = false;
+    private boolean specialLifelineUsed = false;
+
     private StateManager() {}
 
     public static StateManager getInstance() {
@@ -22,7 +26,8 @@ public class StateManager {
         return instance;
     }
 
-    // getters/setters for each field
+    // ... existing getters/setters unchanged ...
+     // getters/setters for each field
     public GameState getScreenState() { 
         return screenState; 
     }
@@ -61,4 +66,24 @@ public class StateManager {
         return withdrawState;
     }
 
+    public boolean isTraceEliminationUsed() { return traceEliminationUsed; }
+    public void useTraceElimination() { traceEliminationUsed = true; }
+
+    public boolean isSystemRerouteUsed() { return systemRerouteUsed; }
+    public void useSystemReroute() { systemRerouteUsed = true; }
+
+    public boolean isSpecialLifelineUsed() { return specialLifelineUsed; }
+    public void useSpecialLifeline() { specialLifelineUsed = true; }
+
+    // Call this when starting a new game/playthrough
+    public void reset() {
+        screenState = GameState.MAIN_MENU;
+        currentQuestionNumber = 1;
+        lastAnswer = AnswerState.UNANSWERED;
+        withdrawState = null;
+        currentHost = null;
+        traceEliminationUsed = false;
+        systemRerouteUsed = false;
+        specialLifelineUsed = false;
+    }
 }
