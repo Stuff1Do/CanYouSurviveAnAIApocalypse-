@@ -1,11 +1,17 @@
 package com.cysaaa.gui;
 
+import java.util.Set;
+
 import com.cysaaa.util.AnswerState;
 import com.cysaaa.util.GameState;
-import com.cysaaa.util.Host; 
+import com.cysaaa.util.Host;
+import com.cysaaa.util.Lifeline; 
+import java.util.EnumSet;
 
 public class StateManager {
     private static StateManager instance;
+
+    private final Set<Lifeline> usedLifelines = EnumSet.noneOf(Lifeline.class);
 
     private GameState screenState = GameState.MAIN_MENU;
     private int currentQuestionNumber = 1;
@@ -27,7 +33,7 @@ public class StateManager {
     }
 
     // ... existing getters/setters unchanged ...
-     // getters/setters for each field
+    // getters/setters for each field
     public GameState getScreenState() { 
         return screenState; 
     }
@@ -36,7 +42,7 @@ public class StateManager {
     }
 
     public Host getCurrentHost() {
-    return currentHost;
+        return currentHost;
     }
 
     public void setCurrentHost(Host h) {
@@ -71,10 +77,27 @@ public class StateManager {
 
     public boolean isSystemRerouteUsed() { return systemRerouteUsed; }
     public void useSystemReroute() { systemRerouteUsed = true; }
-
+    
     public boolean isSpecialLifelineUsed() { return specialLifelineUsed; }
     public void useSpecialLifeline() { specialLifelineUsed = true; }
 
+
+    public boolean isLifelineUsed(Lifeline lifeline) {
+        return usedLifelines.contains(lifeline);
+    }
+
+    public void useLifeline(Lifeline lifeline) {
+        usedLifelines.add(lifeline);
+    }
+
+    public Set<Lifeline> getAvailableLifelines() {
+        Set<Lifeline> available = EnumSet.of(Lifeline.FIFTY_FIFTY, Lifeline.SWITCH_QUESTION);
+        if (currentHost != null) {
+            available.add(currentHost.getSpecialLifeline());
+        }
+        available.removeAll(usedLifelines);
+        return available;
+    }
     // Call this when starting a new game/playthrough
     public void reset() {
         screenState = GameState.MAIN_MENU;
@@ -85,5 +108,6 @@ public class StateManager {
         traceEliminationUsed = false;
         systemRerouteUsed = false;
         specialLifelineUsed = false;
+        usedLifelines.clear();
     }
 }

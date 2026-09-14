@@ -104,10 +104,11 @@ public class ProgressPanel extends BackgroundPanel {
         specialLifelineIcon.setUsed(state.isSpecialLifelineUsed());
 
         Host host = state.getCurrentHost();
+    
         if (host != null) {
             specialLifelineIcon.setActiveImage(
-                host.getLifelineActivePath(),
-                host.getLifelineDisabledPath()
+                host.getSpecialLifeline().getActiveIconPath(),
+                host.getSpecialLifeline().getDisabledIconPath()
             );
         }
     }

@@ -2,11 +2,12 @@ package com.cysaaa.terminal;
 
 import java.util.List;
 import java.util.Scanner;
-
+import java.util.Set;
 import com.cysaaa.gui.StateManager;
 import com.cysaaa.util.AnswerState;
 import com.cysaaa.util.GameState;
 import com.cysaaa.util.Host;
+import com.cysaaa.util.Lifeline;
 import com.cysaaa.util.Question;
 import com.cysaaa.util.QuestionLoader; 
 
@@ -100,11 +101,7 @@ public class TApp {
         int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
         //  ....show question, read player's choice ...
         Question question = randomizedQuestions.get(currentQuestionIndex - 1);
-        System.out.println("Question #"+currentQuestionIndex+":");
-        System.out.println(question);
-        System.out.println("Enter ('withdraw') to withdraw from the game.");//could have the option to withdraw
-        System.out.println("(DEV) enter 'random' to show all randomized questions");
-        System.out.println("Choice(1-4): ");
+        printQuestionMenu(question, currentQuestionIndex);
         String choice = scanner.nextLine();
         if(choice.equals("random")){
             int i = 0;
@@ -123,6 +120,18 @@ public class TApp {
             StateManager.getInstance().setWithdrawState(GameState.WITHDRAW);
             return;
         }
+
+        if(choice.equals("lifeline")){
+           boolean successful = useLifeline();
+           if(!successful){
+                System.out.println("WARNING: Lifeline already used OR Invalid Input!");
+           }
+           askQuestion(randomizedQuestions);
+           return;
+        }
+
+        
+        //TODO: make into new function
         boolean correct = checkAnswer(question, choice); 
 
         if (correct) {
@@ -136,6 +145,79 @@ public class TApp {
             //DialogueManager.getInstance().trigger(DialogueEvent.WRONG_ANSWER);
             
         }
+
+    }
+
+    public void printQuestionMenu(Question question, int currentQuestionIndex){
+        System.out.println("Question #"+currentQuestionIndex+":");
+        System.out.println(question);
+        System.out.println("Enter ('withdraw') to withdraw from the game.");//could have the option to withdraw
+        System.out.println("(DEV) enter 'random' to show all randomized questions");
+        System.out.println();
+        System.out.println("Lifelines: ");
+        Set<Lifeline> lifelines = StateManager.getInstance().getAvailableLifelines();
+        if(lifelines.isEmpty()){
+            System.out.println("No available lifelines.");
+        }else{
+            for(Lifeline lifeline : lifelines){
+                System.out.print("#");
+                System.out.println(lifeline.getDisplayName());
+                
+            }
+        }
+        
+        System.out.println();
+        System.out.println("Enter 'lifeline' to use lifeline: ");
+        System.out.println("Choice(1-4): ");
+    }
+
+    public boolean useLifeline(){
+        System.out.println("Enter #number of lineline: ");
+        System.out.println("Choice: ");
+        int lifeline = Integer.parseInt(scanner.nextLine().trim());
+        if(lifeline == 1){
+            boolean used = StateManager.getInstance().isLifelineUsed(Lifeline.FIFTY_FIFTY);
+            if(!used){
+                 StateManager.getInstance().useLifeline(Lifeline.FIFTY_FIFTY);
+                 System.out.println("Used lifeline 1"); //placeholder
+                 //function for lifeline 1
+            }else{
+                return false;
+            }  
+        }else if(lifeline == 2){
+             boolean used = StateManager.getInstance().isLifelineUsed(Lifeline.SWITCH_QUESTION);
+            if(!used){
+                 StateManager.getInstance().useLifeline(Lifeline.SWITCH_QUESTION);
+                 System.out.println("Used lifeline 2"); //placeholder
+                 //function for lifeline 1
+            }else{
+                return false;
+            }
+            
+        }else if(lifeline == 3){
+            Host currentHost = StateManager.getInstance().getCurrentHost();
+            boolean used = StateManager.getInstance().isLifelineUsed(currentHost.getSpecialLifeline());
+            if(!used){
+                 StateManager.getInstance().useLifeline(currentHost.getSpecialLifeline());
+                 System.out.println("Used special lifeline."); //placeholder
+                 //function for lifeline 1
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+        return true;
+
+    }
+
+    public void lifeline1(){
+
+    }
+    public void lifeline2(){
+
+    }
+    public void specialLifelin(){
 
     }
 
