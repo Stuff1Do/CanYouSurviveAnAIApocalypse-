@@ -10,11 +10,20 @@ import com.cysaaa.util.Host;
 import com.cysaaa.util.Lifeline;
 import com.cysaaa.util.Question;
 import com.cysaaa.util.QuestionLoader; 
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 public class TApp {
     Scanner scanner = new Scanner(System.in);
     Host selectedHost;
 
+
+    List<Question> questionList;
+    List<Question> randomizedQuestions;
+    Set<Integer> eliminatedChoices = new HashSet<>();
+    int eliminatedForQuestionIndex = -1;
     public void run(){
         System.out.println("========WHO WANTS TO SURVIVE AN AI APOCALYPSE?========");
         System.out.println("1. Play");
@@ -68,8 +77,8 @@ public class TApp {
         StateManager.getInstance().setWithdrawState(GameState.PLAYING);
 
         //load questions and randomize questions here
-        List<Question> questionList = QuestionLoader.loadQuestions("/data/questions.csv");
-        List<Question> randomizedQuestions = QuestionLoader.randomizeQuestions(questionList);
+        questionList = QuestionLoader.loadQuestions("/data/questions.csv");
+        randomizedQuestions = QuestionLoader.randomizeQuestions(questionList);
 
         //gameplay loop
         while (true) {
@@ -122,12 +131,12 @@ public class TApp {
         }
 
         if(choice.equals("lifeline")){
-           boolean successful = useLifeline();
-           if(!successful){
-                System.out.println("WARNING: Lifeline already used OR Invalid Input!");
-           }
-           askQuestion(randomizedQuestions);
-           return;
+            boolean successful = useLifeline(question, currentQuestionIndex);
+            if(!successful){
+                    System.out.println("WARNING: Lifeline already used OR Invalid Input!");
+            }
+            askQuestion(randomizedQuestions);
+            return;
         }
 
         
@@ -137,6 +146,7 @@ public class TApp {
         if (correct) {
             StateManager.getInstance().setLastAnswer(AnswerState.CORRECT);
             System.out.println("Correct Answer!");
+            System.out.println();
             //DialogueManager.getInstance().trigger(DialogueEvent.CORRECT_ANSWER);
         } else {
             StateManager.getInstance().setLastAnswer(AnswerState.WRONG);
@@ -149,8 +159,27 @@ public class TApp {
     }
 
     public void printQuestionMenu(Question question, int currentQuestionIndex){
+
+         if (eliminatedForQuestionIndex != currentQuestionIndex) {
+            eliminatedChoices.clear();
+            eliminatedForQuestionIndex = currentQuestionIndex;
+        }
+
         System.out.println("Question #"+currentQuestionIndex+":");
-        System.out.println(question);
+        
+        System.out.println("[" + question.getType() + "] " + question.getQuestionText());
+
+        String[] choices = question.getChoices();
+        for (int i = 0; i < choices.length; i++) {
+            char label = (char) ('A' + i);
+            if (eliminatedChoices.contains(i)) {
+                System.out.println(label + ". [ELIMINATED]");
+            } else {
+                System.out.println(label + ". " + choices[i]);
+            }
+        }
+
+
         System.out.println("Enter ('withdraw') to withdraw from the game.");//could have the option to withdraw
         System.out.println("(DEV) enter 'random' to show all randomized questions");
         System.out.println();
@@ -171,25 +200,27 @@ public class TApp {
         System.out.println("Choice(1-4): ");
     }
 
-    public boolean useLifeline(){
+    public boolean useLifeline(Question question, int currentQuestionIndex){
         System.out.println("Enter #number of lineline: ");
         System.out.println("Choice: ");
         int lifeline = Integer.parseInt(scanner.nextLine().trim());
         if(lifeline == 1){
             boolean used = StateManager.getInstance().isLifelineUsed(Lifeline.FIFTY_FIFTY);
             if(!used){
-                 StateManager.getInstance().useLifeline(Lifeline.FIFTY_FIFTY);
-                 System.out.println("Used lifeline 1"); //placeholder
-                 //function for lifeline 1
+                StateManager.getInstance().useLifeline(Lifeline.FIFTY_FIFTY);
+                System.out.println("Used lifeline 1"); //placeholder
+                //function for lifeline 1
+                lifeline1(question);
             }else{
                 return false;
             }  
         }else if(lifeline == 2){
-             boolean used = StateManager.getInstance().isLifelineUsed(Lifeline.SWITCH_QUESTION);
+            boolean used = StateManager.getInstance().isLifelineUsed(Lifeline.SWITCH_QUESTION);
             if(!used){
-                 StateManager.getInstance().useLifeline(Lifeline.SWITCH_QUESTION);
-                 System.out.println("Used lifeline 2"); //placeholder
-                 //function for lifeline 1
+                StateManager.getInstance().useLifeline(Lifeline.SWITCH_QUESTION);
+                System.out.println("Used lifeline 2"); //placeholder
+                
+                lifeline2(currentQuestionIndex);
             }else{
                 return false;
             }
@@ -198,9 +229,9 @@ public class TApp {
             Host currentHost = StateManager.getInstance().getCurrentHost();
             boolean used = StateManager.getInstance().isLifelineUsed(currentHost.getSpecialLifeline());
             if(!used){
-                 StateManager.getInstance().useLifeline(currentHost.getSpecialLifeline());
-                 System.out.println("Used special lifeline."); //placeholder
-                 //function for lifeline 1
+                StateManager.getInstance().useLifeline(currentHost.getSpecialLifeline());
+                System.out.println("Used special lifeline."); //placeholder
+                //function for lifeline 1
             }else{
                 return false;
             }
@@ -211,13 +242,44 @@ public class TApp {
 
     }
 
-    public void lifeline1(){
+    public void lifeline1(Question question){
+        List<Integer> wrongIndices = new ArrayList<>();
+        int correctIndex = question.getCorrectIndex();
+        for(int i = 0; i < 4; i++){
+            if(i != correctIndex){
+                wrongIndices.add(i);
+            }
+        }
 
+        Collections.shuffle(wrongIndices);
+        eliminatedChoices.add(wrongIndices.get(0));
+        eliminatedChoices.add(wrongIndices.get(1));
+        System.out.println("Two wrong answers eliminated!");
     }
-    public void lifeline2(){
+    public void lifeline2(int currentQuestionIndex){
+        Question current = randomizedQuestions.get(currentQuestionIndex - 1);
+        String category = current.getType();
 
+        //make sure its a diff category
+        List<Question> sameCategoryUnused = new ArrayList<>();
+        for (Question q : questionList) {
+            if (!q.getType().equals(category) && !randomizedQuestions.contains(q)) {
+                sameCategoryUnused.add(q);
+            }
+        }
+
+        //randomize picking a category
+        Random random = new Random();
+        int indexMax = sameCategoryUnused.size();
+        Question replacement = sameCategoryUnused.get(random.nextInt(indexMax));
+        randomizedQuestions.set(currentQuestionIndex - 1, replacement);
+
+        // clear any eliminations, since this is now a different question
+        eliminatedChoices.clear();
+
+        System.out.println("Question swapped!");
     }
-    public void specialLifelin(){
+    public void specialLifeline(){
 
     }
 
@@ -233,7 +295,7 @@ public class TApp {
 
     
     public void checkCheckpoint(){
-       
+    
         int progress = StateManager.getInstance().getCurrentQuestionNumber();
         if(progress >= 7 && progress < 11){
             System.out.println("You survived as a Cybernetic Core!");
@@ -245,7 +307,7 @@ public class TApp {
         
     }
 
-   
+
 
     public void endGame(){
         GameState screenState = StateManager.getInstance().getScreenState();
