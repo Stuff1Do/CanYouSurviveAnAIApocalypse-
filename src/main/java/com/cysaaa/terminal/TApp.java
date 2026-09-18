@@ -24,6 +24,7 @@ public class TApp {
     List<Question> randomizedQuestions;
     Set<Integer> eliminatedChoices = new HashSet<>();
     int eliminatedForQuestionIndex = -1;
+    boolean twoGuesses = false;
     public void run(){
         System.out.println("========WHO WANTS TO SURVIVE AN AI APOCALYPSE?========");
         System.out.println("1. Play");
@@ -135,6 +136,7 @@ public class TApp {
             if(!successful){
                     System.out.println("WARNING: Lifeline already used OR Invalid Input!");
             }
+            
             askQuestion(randomizedQuestions);
             return;
         }
@@ -142,6 +144,14 @@ public class TApp {
         
         //TODO: make into new function
         boolean correct = checkAnswer(question, choice); 
+
+        if(twoGuesses && !correct){
+            twoGuesses = false;
+            System.out.println("Parallel Processing is active! You can guess again.");
+            eliminatedChoices.add(Integer.parseInt(choice.trim()) - 1);
+            askQuestion(randomizedQuestions);
+            return;
+        }
 
         if (correct) {
             StateManager.getInstance().setLastAnswer(AnswerState.CORRECT);
@@ -156,6 +166,19 @@ public class TApp {
             
         }
 
+    }
+
+    
+    public boolean checkAnswer(Question question, String choice) {
+        try {
+            int choiceIndex = Integer.parseInt(choice.trim()) - 1;
+            boolean result = question.isCorrect(choiceIndex);
+
+            return result;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input, counted as wrong.");
+            return false;
+        }
     }
 
     public void printQuestionMenu(Question question, int currentQuestionIndex){
@@ -231,7 +254,8 @@ public class TApp {
             if(!used){
                 StateManager.getInstance().useLifeline(currentHost.getSpecialLifeline());
                 System.out.println("Used special lifeline."); //placeholder
-                //function for lifeline 1
+                //function for lifeline 3
+                specialLifeline(question);
             }else{
                 return false;
             }
@@ -268,7 +292,7 @@ public class TApp {
             }
         }
 
-        //randomize picking a category
+        //randomize picking a question with diff category
         Random random = new Random();
         int indexMax = sameCategoryUnused.size();
         Question replacement = sameCategoryUnused.get(random.nextInt(indexMax));
@@ -279,19 +303,53 @@ public class TApp {
 
         System.out.println("Question swapped!");
     }
-    public void specialLifeline(){
+    public void specialLifeline(Question question){
 
-    }
-
-    public boolean checkAnswer(Question question, String choice) {
-        try {
-            int choiceIndex = Integer.parseInt(choice.trim()) - 1;
-            return question.isCorrect(choiceIndex);
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input, counted as wrong.");
-            return false;
+        Lifeline lifeline = selectedHost.getSpecialLifeline();
+        String lifelineName = lifeline.getDisplayName();
+        System.out.println("Used "+lifelineName);
+        if(lifelineName == "Memory Flush"){
+            memoryFlush();
+        }else if(lifelineName == "Neural Prompt"){
+            neuralPrompt(question);
+        }else if(lifelineName == "Parallel Processing"){
+            parallelProcessing();
         }
     }
+
+    public void memoryFlush(){
+        int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
+        Question current = randomizedQuestions.get(currentQuestionIndex - 1);
+        String category = current.getType();
+        List<Question> sameCategoryUsed = new ArrayList<>();
+        for (Question q : questionList) {
+            if (q.getType().equals(category) && !randomizedQuestions.contains(q)) {
+                sameCategoryUsed.add(q);
+            }
+        }
+
+        Random random = new Random();
+        int indexMax = sameCategoryUsed.size();
+        Question replacement = sameCategoryUsed.get(random.nextInt(indexMax));
+
+        randomizedQuestions.set(currentQuestionIndex -1, replacement);
+
+        eliminatedChoices.clear();
+
+        System.out.println("Question swapped!");
+    }
+
+    public void neuralPrompt(Question question){
+        String hint = question.getHint();
+
+        System.out.println("Neural Prompt: "+hint);
+    }
+
+    public void parallelProcessing(){
+        System.out.println("Activated Parallel Processing!");
+        twoGuesses = true;
+    }
+
 
     
     public void checkCheckpoint(){

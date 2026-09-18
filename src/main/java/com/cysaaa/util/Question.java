@@ -11,16 +11,18 @@ public class Question {
     private  String questionText;
     private  String[] choices;     // exactly 4
     private  int correctIndex;      
+    private  String hint;
 
     public Question(){
 
     }
 
-    public Question(String type, String questionText, String[] choices, int correctIndex) {
+    public Question(String type, String questionText, String[] choices, int correctIndex, String hint) {
         this.type = type;
         this.questionText = questionText;
         this.choices = choices;
         this.correctIndex = correctIndex;
+        this.hint = hint;
     }
 
     
@@ -47,6 +49,10 @@ public class Question {
 
     public boolean isCorrect(int chosenIndex) {
         return chosenIndex == correctIndex;
+    }
+
+    public String getHint(){
+        return hint;
     }
 
     @Override

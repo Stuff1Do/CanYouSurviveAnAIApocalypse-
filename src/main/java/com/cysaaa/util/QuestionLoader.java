@@ -44,6 +44,7 @@ public class QuestionLoader {
                 //get question, choices, and correct answer into variables
                 String type = fields[0].trim();
                 String questionText = fields[1].trim();
+                String hint = fields[7].trim();
                 String[] choices = {
                     fields[2].trim(),
                     fields[3].trim(),
@@ -69,7 +70,7 @@ public class QuestionLoader {
                 }
 
                 //make new question
-                Question question = new Question(type, questionText, choices, correctIndex);
+                Question question = new Question(type, questionText, choices, correctIndex, hint);
                 questions.add(question);
             }
 
