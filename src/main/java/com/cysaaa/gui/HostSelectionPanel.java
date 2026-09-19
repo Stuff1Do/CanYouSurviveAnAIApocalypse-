@@ -9,11 +9,13 @@ import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import com.cysaaa.util.Host;
 import com.cysaaa.util.GameState;
+import com.cysaaa.gui.ProgressPanel;
 
 public class HostSelectionPanel extends BackgroundPanel {
 
-    public HostSelectionPanel(JPanel cardContainer, CardLayout cardLayout) {
+    public HostSelectionPanel(JPanel cardContainer, CardLayout cardLayout, ProgressPanel progressPanel) {
         super("/backgrounds/hostSelection.png");
+
 
         PercentLayout layout = new PercentLayout();
         layout.setDesignSize(1920, 1080);
@@ -26,7 +28,7 @@ public class HostSelectionPanel extends BackgroundPanel {
         host1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showConfirmation(Host.HOST_1, cardContainer, cardLayout);
+                showConfirmation(Host.HOST_1, cardContainer, cardLayout, progressPanel);
             }
         });
 
@@ -36,7 +38,7 @@ public class HostSelectionPanel extends BackgroundPanel {
         host2.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showConfirmation(Host.HOST_2, cardContainer, cardLayout);
+                showConfirmation(Host.HOST_2, cardContainer, cardLayout, progressPanel);
             }
         });
 
@@ -46,13 +48,13 @@ public class HostSelectionPanel extends BackgroundPanel {
         host3.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showConfirmation(Host.HOST_3, cardContainer, cardLayout);
+                showConfirmation(Host.HOST_3, cardContainer, cardLayout, progressPanel);
             }
         });
     }
 
     // Shows a confirmation overlay on top of this panel before committing the host selection
-    private void showConfirmation(Host selectedHost, JPanel cardContainer, CardLayout cardLayout) {
+    private void showConfirmation(Host selectedHost, JPanel cardContainer, CardLayout cardLayout, ProgressPanel progressPanel) {
         JRootPane root = SwingUtilities.getRootPane(this);
         JLayeredPane layeredPane = root.getLayeredPane();
 
@@ -60,8 +62,9 @@ public class HostSelectionPanel extends BackgroundPanel {
             selectedHost,
             () -> { // onYes
                 StateManager.getInstance().setCurrentHost(selectedHost);
-                StateManager.getInstance().setScreenState(GameState.PLAYING);
-                cardLayout.show(cardContainer, "PROGRESS");
+            StateManager.getInstance().setScreenState(GameState.PLAYING);
+            progressPanel.syncWithState(); // NEW — refresh before showing
+            cardLayout.show(cardContainer, "PROGRESS");
             }
         );
 

@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import com.cysaaa.gui.MainMenuPanel;
 import com.cysaaa.gui.ProgressPanel;
 import com.cysaaa.terminal.TApp;
+import com.cysaaa.gui.GameplayPanel;
 import com.cysaaa.gui.HostSelectionPanel;
 import com.cysaaa.gui.InstructionsPanel;
 
@@ -34,16 +35,22 @@ public class App {
             InstructionsPanel instructionsPanel = new InstructionsPanel(cardContainer, cardLayout);
             instructionsPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
-            HostSelectionPanel hostSelectionPanel = new HostSelectionPanel(cardContainer, cardLayout);
-            hostSelectionPanel.setBounds(0, 0, screenSize.width, screenSize.height);
+            GameplayPanel gameplayPanel = new GameplayPanel(cardContainer, cardLayout);
+            gameplayPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
-            ProgressPanel progressPanel = new ProgressPanel(cardContainer, cardLayout);
+            ProgressPanel progressPanel = new ProgressPanel(cardContainer, cardLayout, gameplayPanel);
             progressPanel.setBounds(0, 0, screenSize.width, screenSize.height);
+
+            gameplayPanel.setProgressPanel(progressPanel); // NEW — resolves the circular reference
+
+            HostSelectionPanel hostSelectionPanel = new HostSelectionPanel(cardContainer, cardLayout, progressPanel); // NEW param
+            hostSelectionPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
             cardContainer.add(mainMenuPanel, "MENU");
             cardContainer.add(instructionsPanel, "INSTRUCTIONS");
             cardContainer.add(hostSelectionPanel, "HOST_SELECTION");
             cardContainer.add(progressPanel, "PROGRESS");
+            cardContainer.add(gameplayPanel, "GAMEPLAY");
 
             frame.setContentPane(cardContainer);
             frame.setVisible(true);
