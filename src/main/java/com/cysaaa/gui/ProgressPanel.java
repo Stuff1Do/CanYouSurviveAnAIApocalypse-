@@ -9,6 +9,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import com.cysaaa.util.GameState;
+
 public class ProgressPanel extends BackgroundPanel {
 
     private PercentLayout percentLayout;
@@ -58,10 +60,10 @@ public class ProgressPanel extends BackgroundPanel {
         );
         percentLayout.addPixel(this, specialLifelineIcon, 164, 680, 502, 158);
 
-        /* 
+        
         // Continue button -> back to GAMEPLAY for the next question
         continueButton = new ImagePanel("/images/continue_button.png", "/images/continue_button_hover.png");
-        percentLayout.addPixel(this, continueButton, 1500, 950, 200, 80);
+        percentLayout.addPixel(this, continueButton, 1022, 925, 366, 93);
         continueButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -69,16 +71,29 @@ public class ProgressPanel extends BackgroundPanel {
             }
         });
 
-        // Withdraw button -> go to WITHDRAW screen
+        // Withdraw button -> go to END screen
         withdrawButton = new ImagePanel("/images/withdraw_button.png", "/images/withdraw_button_hover.png");
-        percentLayout.addPixel(this, withdrawButton, 100, 950, 200, 80);
+        percentLayout.addPixel(this, withdrawButton, 526, 922, 366, 93);
         withdrawButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                cardLayout.show(mainPanel, "WITHDRAW");
+                JRootPane root = SwingUtilities.getRootPane(ProgressPanel.this);
+                JLayeredPane layeredPane = root.getLayeredPane();
+
+                ConfirmationOverlay overlay = new ConfirmationOverlay(
+                    "/popups/withdrawConfirm.png",
+                    () -> { // onYes
+                        StateManager.getInstance().setScreenState(GameState.WITHDRAW);
+                        cardLayout.show(mainPanel, "END");
+                    }
+                );
+
+                overlay.setBounds(0, 0, getWidth(), getHeight());
+                layeredPane.add(overlay, JLayeredPane.POPUP_LAYER);
+                layeredPane.repaint();
             }
         });
-        */
+        
        // Auto-sync every time this panel becomes visible — no manual call needed elsewhere
         addComponentListener(new ComponentAdapter() {
             @Override
