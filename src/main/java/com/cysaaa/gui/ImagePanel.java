@@ -72,6 +72,29 @@ public class ImagePanel extends JPanel {
         repaint();
     }
 
+    // Use this constructor when no image should be shown yet
+    // (e.g. content that gets set immediately after construction via setImage/setActiveImage)
+    public ImagePanel() {
+        this.image = null;
+        this.hoverImage = null;
+        setOpaque(false);
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                hovering = true;
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                hovering = false;
+                repaint();
+            }
+        });
+    }
+
     // Call this to enable shape-accurate (alpha-based) hover/click detection,
     // so transparent parts of the image no longer respond to mouse events.
     public void setPixelPreciseHitTest(boolean enabled) {

@@ -1,6 +1,6 @@
 package com.cysaaa.gui;
-
 import com.cysaaa.util.Host;
+import com.cysaaa.gui.GameplayPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,6 +23,7 @@ public class ProgressPanel extends BackgroundPanel {
     private LifelineIconPanel specialLifelineIcon;
     private ImagePanel continueButton;
     private ImagePanel withdrawButton;
+     private GameplayPanel gameplayPanel;
 
     private static final String[] PROGRESS_IMAGES = {
         "/images/progress_00.png", "/images/progress_01.png", "/images/progress_02.png",
@@ -33,8 +34,12 @@ public class ProgressPanel extends BackgroundPanel {
         "/images/progress_15.png"
     };
 
-    public ProgressPanel(JPanel mainPanel, CardLayout cardLayout) {
+    public ProgressPanel(JPanel mainPanel, CardLayout cardLayout, GameplayPanel gameplayPanel) {
         super("/backgrounds/progress.png");
+
+        this.mainPanel = mainPanel;
+        this.cardLayout = cardLayout;
+        this.gameplayPanel = gameplayPanel; 
 
         percentLayout = new PercentLayout();
         setLayout(percentLayout);
@@ -67,6 +72,7 @@ public class ProgressPanel extends BackgroundPanel {
         continueButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                gameplayPanel.syncWithState(); // refresh BEFORE switching, not after
                 cardLayout.show(mainPanel, "GAMEPLAY");
             }
         });
@@ -84,7 +90,7 @@ public class ProgressPanel extends BackgroundPanel {
                     "/popups/withdrawConfirm.png",
                     () -> { // onYes
                         StateManager.getInstance().setScreenState(GameState.WITHDRAW);
-                        cardLayout.show(mainPanel, "END");
+                        cardLayout.show(mainPanel, "MENU");
                     }
                 );
 

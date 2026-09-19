@@ -6,7 +6,7 @@ public class LifelineIconPanel extends ImagePanel {
     private boolean used = false;
 
     public LifelineIconPanel(String activeImagePath, String disabledImagePath) {
-        super(activeImagePath); // adjust if ImagePanel's constructor differs
+        super(activeImagePath);
         this.activeImagePath = activeImagePath;
         this.disabledImagePath = disabledImagePath;
     }
@@ -15,7 +15,7 @@ public class LifelineIconPanel extends ImagePanel {
     public void setActiveImage(String newActivePath, String newDisabledPath) {
         this.activeImagePath = newActivePath;
         this.disabledImagePath = newDisabledPath;
-        setImage(used ? disabledImagePath : activeImagePath); // adjust if ImagePanel's swap method has a different name
+        setImage(used ? disabledImagePath : activeImagePath);
         repaint();
     }
 
