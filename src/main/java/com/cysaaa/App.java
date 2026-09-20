@@ -11,6 +11,7 @@ import com.cysaaa.terminal.TApp;
 import com.cysaaa.gui.GameplayPanel;
 import com.cysaaa.gui.HostSelectionPanel;
 import com.cysaaa.gui.InstructionsPanel;
+import com.cysaaa.gui.SplashScreenPanel;
 
 public class App {
     public static void main(String[] args) {
@@ -29,6 +30,9 @@ public class App {
             JPanel cardContainer = new JPanel(new CardLayout());
             CardLayout cardLayout = (CardLayout) cardContainer.getLayout();
 
+            SplashScreenPanel splashScreenPanel = new SplashScreenPanel(cardContainer, cardLayout);
+            splashScreenPanel.setBounds(0, 0, screenSize.width, screenSize.height);
+
             MainMenuPanel mainMenuPanel = new MainMenuPanel(cardContainer, cardLayout);
             mainMenuPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
@@ -46,6 +50,7 @@ public class App {
             HostSelectionPanel hostSelectionPanel = new HostSelectionPanel(cardContainer, cardLayout, progressPanel); // NEW param
             hostSelectionPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
+            cardContainer.add(splashScreenPanel, "SPLASH");
             cardContainer.add(mainMenuPanel, "MENU");
             cardContainer.add(instructionsPanel, "INSTRUCTIONS");
             cardContainer.add(hostSelectionPanel, "HOST_SELECTION");
@@ -54,6 +59,7 @@ public class App {
 
             frame.setContentPane(cardContainer);
             frame.setVisible(true);
+            cardLayout.show(cardContainer, "SPLASH");
         }
 
     }
