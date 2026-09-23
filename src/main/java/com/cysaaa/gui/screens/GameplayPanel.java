@@ -193,8 +193,8 @@ public class GameplayPanel extends BackgroundPanel {
     private void buildUIComponents() {
         typeLabel = new JLabel("", SwingConstants.CENTER);
         typeLabel.setForeground(Color.WHITE);
-        typeLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
-        percentLayout.addPixel(this, typeLabel, 173, 97, 634, 86);
+        typeLabel.setFont(new Font("SansSerif", Font.BOLD, 40));
+        percentLayout.addPixel(this, typeLabel, 365, 83, 584, 55);
 
         questionTextLabel = new JLabel();
         questionTextLabel.setForeground(Color.WHITE);
