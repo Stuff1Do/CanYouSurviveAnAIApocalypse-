@@ -62,16 +62,34 @@ public class GameplayPanel extends BackgroundPanel {
         percentLayout = new PercentLayout();
         setLayout(percentLayout);      
 
+
+        //load questions & randomize
+        loadQuestionList();
+        randomizeQuestions(questionList);
+
+        buildUIComponents(); //build everything once, then load questions later
+
+        //on load 
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
                 syncWithState();
+                loadCurrentQuestion();
             }
         });
-        syncWithState();
 
-        startGame();
         
+    }
+
+    public void loadCurrentQuestion() {
+        int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
+
+        if (randomizedQuestions == null || currentQuestionIndex > randomizedQuestions.size()) {
+            return; // no more questions, game should have already transitioned screens
+        }
+
+        Question question = randomizedQuestions.get(currentQuestionIndex - 1);
+        setQuestion(question.getType(), question.getQuestionText(), question.getChoices(), "");
     }
 
     private void wireAnswer(ImagePanel button, int index) {
@@ -102,8 +120,20 @@ public class GameplayPanel extends BackgroundPanel {
 
     // TODO: hook up to Question/scoring logic once that exists
     private void onAnswerSelected(int index) {
-        System.out.println("Answer selected: " + index);
-        progressPanel.syncWithState(); // NEW — refresh before showing
+        int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
+        Question question = randomizedQuestions.get(currentQuestionIndex - 1);
+
+        boolean correct = question.isCorrect(index);
+
+        if (correct) {
+            StateManager.getInstance().setLastAnswer(AnswerState.CORRECT);
+            StateManager.getInstance().nextQuestion();
+        } else {
+            StateManager.getInstance().setLastAnswer(AnswerState.WRONG);
+            StateManager.getInstance().setScreenState(GameState.GAME_OVER);
+        }
+
+        progressPanel.syncWithState();
         cardLayout.show(mainPanel, "PROGRESS");
     }
 
@@ -120,11 +150,11 @@ public class GameplayPanel extends BackgroundPanel {
             );
         }
 
-        /*         
+         
         traceEliminationButton.setUsed(state.isLifelineUsed(Lifeline.FIFTY_FIFTY));
         systemRerouteButton.setUsed(state.isLifelineUsed(Lifeline.SWITCH_QUESTION));
-        specialLifelineButton.setUsed(state.isLifelineUsed());
-        */
+        specialLifelineButton.setUsed(state.isLifelineUsed(host.getSpecialLifeline()));
+        
     }   
 
     public void startGame(){
@@ -255,5 +285,62 @@ public class GameplayPanel extends BackgroundPanel {
         choicesLabel.setText(sb.toString());
 
         dialogueLabel.setText("<html>" + hostDialogue + "</html>");
+    }
+
+    
+    private void buildUIComponents() {
+        typeLabel = new JLabel("", SwingConstants.CENTER);
+        typeLabel.setForeground(Color.WHITE);
+        typeLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+        percentLayout.addPixel(this, typeLabel, 173, 97, 634, 86);
+
+        questionTextLabel = new JLabel();
+        questionTextLabel.setForeground(Color.WHITE);
+        questionTextLabel.setFont(new Font("SansSerif", Font.ITALIC, 16));
+        questionTextLabel.setVerticalAlignment(SwingConstants.TOP);
+        percentLayout.addPixel(this, questionTextLabel, 213, 273, 976, 150);
+
+        choicesLabel = new JLabel();
+        choicesLabel.setForeground(Color.WHITE);
+        choicesLabel.setFont(new Font("SansSerif", Font.ITALIC, 16));
+        choicesLabel.setVerticalAlignment(SwingConstants.TOP);
+        percentLayout.addPixel(this, choicesLabel, 213, 450, 976, 160);
+
+        dialogueLabel = new JLabel();
+        dialogueLabel.setForeground(Color.WHITE);
+        dialogueLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        dialogueLabel.setVerticalAlignment(SwingConstants.TOP);
+        percentLayout.addPixel(this, dialogueLabel, 1332, 119, 495, 237);
+
+        hostImage = new ImagePanel();
+        percentLayout.addPixel(this, hostImage, 1351, 260, 436, 507);
+
+        answerA = new ImagePanel("/buttons/answer_a.png", "/buttons/answer_a_hover.png");
+        percentLayout.addPixel(this, answerA, 194, 873, 474, 60);
+        wireAnswer(answerA, 0);
+
+        answerB = new ImagePanel("/buttons/answer_b.png", "/buttons/answer_b_hover.png");
+        percentLayout.addPixel(this, answerB, 647, 873, 474, 60);
+        wireAnswer(answerB, 1);
+
+        answerC = new ImagePanel("/buttons/answer_c.png", "/buttons/answer_c_hover.png");
+        percentLayout.addPixel(this, answerC, 194, 963, 474, 60);
+        wireAnswer(answerC, 2);
+
+        answerD = new ImagePanel("/buttons/answer_d.png", "/buttons/answer_d_hover.png");
+        percentLayout.addPixel(this, answerD, 647, 963, 474, 60);
+        wireAnswer(answerD, 3);
+
+        traceEliminationButton = new LifelineIconPanel("/buttons/TraceElButton.png", "/buttons/TraceElButtonDisabled.png");
+        percentLayout.addPixel(this, traceEliminationButton, 1303, 873, 539, 64);
+        wireLifeline(traceEliminationButton, "TRACE_ELIMINATION");
+
+        systemRerouteButton = new LifelineIconPanel("/buttons/SysReButton.png", "/buttons/SysReButtonDisabled.png");
+        percentLayout.addPixel(this, systemRerouteButton, 1303, 957, 539, 64);
+        wireLifeline(systemRerouteButton, "SYSTEM_REROUTE");
+
+        specialLifelineButton = new LifelineIconPanel("/buttons/placeholder.png", "/buttons/placeholder.png");
+        percentLayout.addPixel(this, specialLifelineButton, 1303, 790, 539, 64);
+        wireLifeline(specialLifelineButton, "SPECIAL");
     }
 }
