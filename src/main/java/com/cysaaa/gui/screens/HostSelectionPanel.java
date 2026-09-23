@@ -1,4 +1,4 @@
-package com.cysaaa.gui;
+package com.cysaaa.gui.screens;
 
 import java.awt.CardLayout;
 import java.awt.event.MouseAdapter;
@@ -9,7 +9,10 @@ import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import com.cysaaa.util.Host;
 import com.cysaaa.util.GameState;
-import com.cysaaa.gui.ProgressPanel;
+import com.cysaaa.gui.screens.ProgressPanel;
+import com.cysaaa.gui.components.*;
+import com.cysaaa.util.StateManager;
+
 
 public class HostSelectionPanel extends BackgroundPanel {
 
@@ -63,8 +66,9 @@ public class HostSelectionPanel extends BackgroundPanel {
             () -> { // onYes
                 StateManager.getInstance().setCurrentHost(selectedHost);
             StateManager.getInstance().setScreenState(GameState.PLAYING);
-            progressPanel.syncWithState(); // NEW — refresh before showing
+            progressPanel.syncWithState(); 
             cardLayout.show(cardContainer, "PROGRESS");
+                StateManager.getInstance().setCurrentHost(selectedHost); //set host lol
             }
         );
 

@@ -3,7 +3,7 @@ package com.cysaaa.terminal;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import com.cysaaa.gui.StateManager;
+import com.cysaaa.util.StateManager;
 import com.cysaaa.util.AnswerState;
 import com.cysaaa.util.GameState;
 import com.cysaaa.util.Host;

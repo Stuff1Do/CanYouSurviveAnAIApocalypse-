@@ -1,4 +1,4 @@
-package com.cysaaa.gui;
+package com.cysaaa.gui.components;
 
 import java.awt.Image;
 import javax.swing.ImageIcon;

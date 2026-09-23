@@ -1,10 +1,10 @@
-package com.cysaaa.gui;
+package com.cysaaa.gui.screens;
 
 import java.awt.CardLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
-
+import com.cysaaa.gui.components.*;
 public class InstructionsPanel extends BackgroundPanel {
 
     public InstructionsPanel(JPanel cardContainer, CardLayout cardLayout) {

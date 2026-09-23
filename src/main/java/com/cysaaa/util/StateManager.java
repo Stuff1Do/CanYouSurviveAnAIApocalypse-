@@ -1,4 +1,4 @@
-package com.cysaaa.gui;
+package com.cysaaa.util;
 
 import java.util.Set;
 
@@ -18,10 +18,6 @@ public class StateManager {
     private AnswerState lastAnswer = AnswerState.UNANSWERED;
     private GameState withdrawState;
     private Host currentHost;
-
-    private boolean traceEliminationUsed = false;
-    private boolean systemRerouteUsed = false;
-    private boolean specialLifelineUsed = false;
 
     private StateManager() {}
 
@@ -72,15 +68,6 @@ public class StateManager {
         return withdrawState;
     }
 
-    public boolean isTraceEliminationUsed() { return traceEliminationUsed; }
-    public void useTraceElimination() { traceEliminationUsed = true; }
-
-    public boolean isSystemRerouteUsed() { return systemRerouteUsed; }
-    public void useSystemReroute() { systemRerouteUsed = true; }
-    
-    public boolean isSpecialLifelineUsed() { return specialLifelineUsed; }
-    public void useSpecialLifeline() { specialLifelineUsed = true; }
-
 
     public boolean isLifelineUsed(Lifeline lifeline) {
         return usedLifelines.contains(lifeline);
@@ -105,9 +92,6 @@ public class StateManager {
         lastAnswer = AnswerState.UNANSWERED;
         withdrawState = null;
         currentHost = null;
-        traceEliminationUsed = false;
-        systemRerouteUsed = false;
-        specialLifelineUsed = false;
         usedLifelines.clear();
     }
 }

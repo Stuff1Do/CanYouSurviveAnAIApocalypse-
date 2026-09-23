@@ -1,5 +1,5 @@
 
-package com.cysaaa.gui;
+package com.cysaaa.gui.components;
 
 
 import java.awt.Graphics;

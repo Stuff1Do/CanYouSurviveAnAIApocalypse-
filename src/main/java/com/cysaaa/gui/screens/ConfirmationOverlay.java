@@ -1,10 +1,11 @@
-package com.cysaaa.gui;
+package com.cysaaa.gui.screens;
 
 import java.awt.Container;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 import com.cysaaa.util.Host;
+import com.cysaaa.gui.components.*;
 
 public class ConfirmationOverlay extends JPanel {
 

@@ -1,4 +1,4 @@
-package com.cysaaa.gui;
+package com.cysaaa.gui.screens;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
@@ -13,6 +13,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import com.cysaaa.gui.components.*;
+import com.cysaaa.util.StateManager;
+
 
 public class SplashScreenPanel extends JPanel {
     private static final int SPLASH_DURATION_MS = 14000;

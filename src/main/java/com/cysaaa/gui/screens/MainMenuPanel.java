@@ -1,9 +1,12 @@
-package com.cysaaa.gui;
+package com.cysaaa.gui.screens;
 
 import java.awt.CardLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
+import com.cysaaa.gui.components.*;
+import com.cysaaa.util.StateManager;
+
 
 public class MainMenuPanel extends BackgroundPanel {
 

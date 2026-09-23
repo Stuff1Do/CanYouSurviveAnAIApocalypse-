@@ -5,13 +5,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import com.cysaaa.gui.MainMenuPanel;
-import com.cysaaa.gui.ProgressPanel;
 import com.cysaaa.terminal.TApp;
-import com.cysaaa.gui.GameplayPanel;
-import com.cysaaa.gui.HostSelectionPanel;
-import com.cysaaa.gui.InstructionsPanel;
-import com.cysaaa.gui.SplashScreenPanel;
+import com.cysaaa.gui.screens.*;
 
 public class App {
     public static void main(String[] args) {

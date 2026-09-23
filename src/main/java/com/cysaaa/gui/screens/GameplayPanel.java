@@ -1,14 +1,20 @@
-package com.cysaaa.gui;
+package com.cysaaa.gui.screens;
 
 import com.cysaaa.util.Host;
+import com.cysaaa.util.Lifeline;
+import com.cysaaa.util.Question;
+import com.cysaaa.util.StateManager;
 import com.cysaaa.util.GameState;
-
+import java.util.List;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import com.cysaaa.gui.components.*;
+import com.cysaaa.util.*;
+
 
 public class GameplayPanel extends BackgroundPanel {
 
@@ -42,6 +48,9 @@ public class GameplayPanel extends BackgroundPanel {
     private LifelineIconPanel systemRerouteButton;
     private LifelineIconPanel specialLifelineButton;
 
+    List<Question> questionList;
+    List<Question> randomizedQuestions;
+
     
 
     public GameplayPanel(JPanel mainPanel, CardLayout cardLayout) {
@@ -51,11 +60,106 @@ public class GameplayPanel extends BackgroundPanel {
         this.cardLayout = cardLayout;
 
         percentLayout = new PercentLayout();
-        setLayout(percentLayout);
+        setLayout(percentLayout);      
 
-        // --- Question type banner ---
-        // TODO: Change JLabel text for question type banner depending on the question.
-        typeLabel = new JLabel("TYPE: REMEMBER", SwingConstants.CENTER);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                syncWithState();
+            }
+        });
+        syncWithState();
+
+        startGame();
+        
+    }
+
+    private void wireAnswer(ImagePanel button, int index) {
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                onAnswerSelected(index);
+            }
+        });
+    }
+
+    private void wireLifeline(LifelineIconPanel button, String lifelineKey) {
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                onLifelineClicked(lifelineKey, button);
+            }
+        });
+    }
+
+    // TODO: hook up real lifeline effects (eliminate choices, swap question, host effect)
+    private void onLifelineClicked(String lifelineKey, LifelineIconPanel button) {
+        if (button.isUsed()) return; // already used, ignore clicks
+        System.out.println("Lifeline used: " + lifelineKey);
+        button.setUsed(true);
+        // e.g. StateManager.getInstance().markLifelineUsed(lifelineKey);
+    }
+
+    // TODO: hook up to Question/scoring logic once that exists
+    private void onAnswerSelected(int index) {
+        System.out.println("Answer selected: " + index);
+        progressPanel.syncWithState(); // NEW — refresh before showing
+        cardLayout.show(mainPanel, "PROGRESS");
+    }
+
+    // Call this every time GAMEPLAY is about to be shown
+    public void syncWithState() {
+        StateManager state = StateManager.getInstance();
+        Host host = state.getCurrentHost();
+
+        if (host != null) {
+            hostImage.setImage(host.getGameplayImagePath());
+            specialLifelineButton.setActiveImage(
+                host.getSpecialLifeline().getGameplayActiveIconPath(),
+                host.getSpecialLifeline().getGameplayDisabledIconPath()
+            );
+        }
+
+        /*         
+        traceEliminationButton.setUsed(state.isLifelineUsed(Lifeline.FIFTY_FIFTY));
+        systemRerouteButton.setUsed(state.isLifelineUsed(Lifeline.SWITCH_QUESTION));
+        specialLifelineButton.setUsed(state.isLifelineUsed());
+        */
+    }   
+
+    public void startGame(){
+        loadQuestionList();
+        randomizeQuestions(questionList);
+
+
+        while(true){
+            int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
+            GameState withdrawState = StateManager.getInstance().getWithdrawState();
+            GameState screenState = StateManager.getInstance().getScreenState();
+
+            if (currentQuestionIndex > randomizedQuestions.size() || withdrawState == GameState.WITHDRAW || screenState == GameState.GAME_OVER) {
+                break;
+            }
+
+            askQuestion(randomizedQuestions.get(currentQuestionIndex - 1));
+
+            // only increment count if the game is still active
+            if (StateManager.getInstance().getScreenState() != GameState.GAME_OVER && StateManager.getInstance().getWithdrawState() != GameState.WITHDRAW) {
+                StateManager.getInstance().nextQuestion();
+            }
+        }
+
+
+       
+
+
+    }
+
+    public void askQuestion(Question question){
+
+
+        String questionType = question.getType();
+        typeLabel = new JLabel(questionType, SwingConstants.CENTER);
         typeLabel.setForeground(Color.WHITE);
         typeLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
         percentLayout.addPixel(this, typeLabel, 173, 97, 634, 86);
@@ -124,69 +228,19 @@ public class GameplayPanel extends BackgroundPanel {
         );
         percentLayout.addPixel(this, specialLifelineButton, 1303, 790, 539, 64);
         wireLifeline(specialLifelineButton, "SPECIAL");
-
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent e) {
-                syncWithState();
-            }
-        });
-        syncWithState();
     }
 
-    private void wireAnswer(ImagePanel button, int index) {
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                onAnswerSelected(index);
-            }
-        });
+
+    public void loadQuestionList(){
+        questionList = QuestionLoader.loadQuestions("/data/questions.csv");
+        
     }
 
-    private void wireLifeline(LifelineIconPanel button, String lifelineKey) {
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                onLifelineClicked(lifelineKey, button);
-            }
-        });
+    public void randomizeQuestions(List<Question> questions){
+        randomizedQuestions = QuestionLoader.randomizeQuestions(questionList);
     }
 
-    // TODO: hook up real lifeline effects (eliminate choices, swap question, host effect)
-    private void onLifelineClicked(String lifelineKey, LifelineIconPanel button) {
-        if (button.isUsed()) return; // already used, ignore clicks
-        System.out.println("Lifeline used: " + lifelineKey);
-        button.setUsed(true);
-        // e.g. StateManager.getInstance().markLifelineUsed(lifelineKey);
-    }
-
-    // TODO: hook up to Question/scoring logic once that exists
-    private void onAnswerSelected(int index) {
-        System.out.println("Answer selected: " + index);
-        progressPanel.syncWithState(); // NEW — refresh before showing
-        cardLayout.show(mainPanel, "PROGRESS");
-    }
-
-    // Call this every time GAMEPLAY is about to be shown
-    public void syncWithState() {
-        StateManager state = StateManager.getInstance();
-        Host host = state.getCurrentHost();
-
-        if (host != null) {
-            hostImage.setImage(host.getGameplayImagePath());
-            specialLifelineButton.setActiveImage(
-                host.getSpecialLifeline().getGameplayActiveIconPath(),
-                host.getSpecialLifeline().getGameplayDisabledIconPath()
-            );
-        }
-
-        traceEliminationButton.setUsed(state.isTraceEliminationUsed());
-        systemRerouteButton.setUsed(state.isSystemRerouteUsed());
-        specialLifelineButton.setUsed(state.isSpecialLifelineUsed());
-
-        // TODO: pull real question text/choices/type/dialogue once Question class exists
-    }
-
+    
     // Call this once question data exists, to populate the screen
     public void setQuestion(String type, String questionText, String[] choices, String hostDialogue) {
         typeLabel.setText("TYPE: " + type.toUpperCase());

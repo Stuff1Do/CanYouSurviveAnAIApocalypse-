@@ -1,6 +1,5 @@
-package com.cysaaa.gui;
+package com.cysaaa.gui.screens;
 import com.cysaaa.util.Host;
-import com.cysaaa.gui.GameplayPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +8,10 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import com.cysaaa.util.GameState;
+import com.cysaaa.gui.components.*;
+import com.cysaaa.util.*;
+import com.cysaaa.util.StateManager;
+
 
 public class ProgressPanel extends BackgroundPanel {
 
@@ -116,15 +118,14 @@ public class ProgressPanel extends BackgroundPanel {
     // Call this every time PROGRESS is about to be shown
     public void syncWithState() {
         StateManager state = StateManager.getInstance();
+        Host host = state.getCurrentHost();
 
         int questionsAnswered = state.getCurrentQuestionNumber() - 1;
         refreshProgress(questionsAnswered);
 
-        traceEliminationIcon.setUsed(state.isTraceEliminationUsed());
-        systemRerouteIcon.setUsed(state.isSystemRerouteUsed());
-        specialLifelineIcon.setUsed(state.isSpecialLifelineUsed());
-
-        Host host = state.getCurrentHost();
+        traceEliminationIcon.setUsed(state.isLifelineUsed(Lifeline.FIFTY_FIFTY));
+        systemRerouteIcon.setUsed(state.isLifelineUsed(Lifeline.SWITCH_QUESTION));
+        specialLifelineIcon.setUsed(state.isLifelineUsed(host.getSpecialLifeline()));
     
         if (host != null) {
             specialLifelineIcon.setActiveImage(

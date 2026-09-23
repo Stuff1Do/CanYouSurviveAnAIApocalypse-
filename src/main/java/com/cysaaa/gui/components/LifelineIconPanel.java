@@ -1,4 +1,4 @@
-package com.cysaaa.gui;
+package com.cysaaa.gui.components;
 
 public class LifelineIconPanel extends ImagePanel {
     private String activeImagePath;
