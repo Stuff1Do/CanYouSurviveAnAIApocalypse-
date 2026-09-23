@@ -45,7 +45,8 @@ public class App {
             HostSelectionPanel hostSelectionPanel = new HostSelectionPanel(cardContainer, cardLayout, progressPanel); // NEW param
             hostSelectionPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
-            GameOverPanel gameOverPanel = new GameOverPanel();
+            GameOverPanel gameOverPanel = new GameOverPanel(cardContainer, cardLayout);
+            gameOverPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
             cardContainer.add(gameOverPanel, "GAME_OVER");
             cardContainer.add(splashScreenPanel, "SPLASH");
@@ -54,6 +55,7 @@ public class App {
             cardContainer.add(hostSelectionPanel, "HOST_SELECTION");
             cardContainer.add(progressPanel, "PROGRESS");
             cardContainer.add(gameplayPanel, "GAMEPLAY");
+            cardContainer.add(gameOverPanel, "GAME_OVER");
 
             frame.setContentPane(cardContainer);
             frame.setVisible(true);
