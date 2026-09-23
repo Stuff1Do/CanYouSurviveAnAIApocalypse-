@@ -90,7 +90,7 @@ public class ProgressPanel extends BackgroundPanel {
 
                 ConfirmationOverlay overlay = new ConfirmationOverlay(
                     "/popups/withdrawConfirm.png",
-                    () -> { // onYes
+                    () -> { // TODO: implement GAMEOVER screen
                         StateManager.getInstance().setScreenState(GameState.WITHDRAW);
                         cardLayout.show(mainPanel, "MENU");
                     }

@@ -16,7 +16,7 @@ public class App {
         }else{
              Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         
-            JFrame frame = new JFrame("Can You Survive an AI Apocalypse?");
+            JFrame frame = new JFrame("Who wants To Survive an AI Apocalypse?");
             frame.setUndecorated(true);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(screenSize.width, screenSize.height);
@@ -45,6 +45,9 @@ public class App {
             HostSelectionPanel hostSelectionPanel = new HostSelectionPanel(cardContainer, cardLayout, progressPanel); // NEW param
             hostSelectionPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
+            GameOverPanel gameOverPanel = new GameOverPanel();
+
+            cardContainer.add(gameOverPanel, "GAME_OVER");
             cardContainer.add(splashScreenPanel, "SPLASH");
             cardContainer.add(mainMenuPanel, "MENU");
             cardContainer.add(instructionsPanel, "INSTRUCTIONS");

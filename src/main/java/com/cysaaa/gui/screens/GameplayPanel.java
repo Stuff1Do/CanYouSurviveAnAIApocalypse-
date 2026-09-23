@@ -61,8 +61,7 @@ public class GameplayPanel extends BackgroundPanel {
 
         percentLayout = new PercentLayout();
         setLayout(percentLayout);      
-
-
+        
         //load questions & randomize
         loadQuestionList();
         randomizeQuestions(questionList);
@@ -118,7 +117,6 @@ public class GameplayPanel extends BackgroundPanel {
         // e.g. StateManager.getInstance().markLifelineUsed(lifelineKey);
     }
 
-    // TODO: hook up to Question/scoring logic once that exists
     private void onAnswerSelected(int index) {
         int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
         Question question = randomizedQuestions.get(currentQuestionIndex - 1);
@@ -128,13 +126,20 @@ public class GameplayPanel extends BackgroundPanel {
         if (correct) {
             StateManager.getInstance().setLastAnswer(AnswerState.CORRECT);
             StateManager.getInstance().nextQuestion();
+
+              if (StateManager.getInstance().getCurrentQuestionNumber() > randomizedQuestions.size()) {
+                // answered all 15 correctly
+                StateManager.getInstance().setScreenState(GameState.VICTORY);
+                cardLayout.show(mainPanel, "VICTORY");
+            } else {
+                progressPanel.syncWithState();
+                cardLayout.show(mainPanel, "PROGRESS");
+            }
         } else {
             StateManager.getInstance().setLastAnswer(AnswerState.WRONG);
             StateManager.getInstance().setScreenState(GameState.GAME_OVER);
+            cardLayout.show(mainPanel, "GAME_OVER");
         }
-
-        progressPanel.syncWithState();
-        cardLayout.show(mainPanel, "PROGRESS");
     }
 
     // Call this every time GAMEPLAY is about to be shown
@@ -156,109 +161,6 @@ public class GameplayPanel extends BackgroundPanel {
         specialLifelineButton.setUsed(state.isLifelineUsed(host.getSpecialLifeline()));
         
     }   
-
-    public void startGame(){
-        loadQuestionList();
-        randomizeQuestions(questionList);
-
-
-        while(true){
-            int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
-            GameState withdrawState = StateManager.getInstance().getWithdrawState();
-            GameState screenState = StateManager.getInstance().getScreenState();
-
-            if (currentQuestionIndex > randomizedQuestions.size() || withdrawState == GameState.WITHDRAW || screenState == GameState.GAME_OVER) {
-                break;
-            }
-
-            askQuestion(randomizedQuestions.get(currentQuestionIndex - 1));
-
-            // only increment count if the game is still active
-            if (StateManager.getInstance().getScreenState() != GameState.GAME_OVER && StateManager.getInstance().getWithdrawState() != GameState.WITHDRAW) {
-                StateManager.getInstance().nextQuestion();
-            }
-        }
-
-
-       
-
-
-    }
-
-    public void askQuestion(Question question){
-
-
-        String questionType = question.getType();
-        typeLabel = new JLabel(questionType, SwingConstants.CENTER);
-        typeLabel.setForeground(Color.WHITE);
-        typeLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
-        percentLayout.addPixel(this, typeLabel, 173, 97, 634, 86);
-
-        // --- Question box ---
-        questionTextLabel = new JLabel("<html>Question text goes here.</html>");
-        questionTextLabel.setForeground(Color.WHITE);
-        questionTextLabel.setFont(new Font("SansSerif", Font.ITALIC, 16));
-        questionTextLabel.setVerticalAlignment(SwingConstants.TOP);
-        percentLayout.addPixel(this, questionTextLabel, 213, 273, 976, 150);
-
-        choicesLabel = new JLabel("<html>A. ...<br>B. ...<br>C. ...<br>D. ...</html>");
-        choicesLabel.setForeground(Color.WHITE);
-        choicesLabel.setFont(new Font("SansSerif", Font.ITALIC, 16));
-        choicesLabel.setVerticalAlignment(SwingConstants.TOP);
-        percentLayout.addPixel(this, choicesLabel, 213, 450, 976, 160);
-
-        // --- Host speech bubble ---
-        // TODO: Change dialogue label text depending on the host label.
-        dialogueLabel = new JLabel("<html>Host dialogue goes here.</html>");
-        dialogueLabel.setForeground(Color.WHITE);
-        dialogueLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
-        dialogueLabel.setVerticalAlignment(SwingConstants.TOP);
-        percentLayout.addPixel(this, dialogueLabel, 1332, 119, 495, 237);
-
-        // --- Host image (gameplay-specific per-host asset) ---
-        hostImage = new ImagePanel();
-        percentLayout.addPixel(this, hostImage, 1351, 260, 436, 507);
-
-        // --- Answer buttons ---
-        answerA = new ImagePanel("/buttons/answer_a.png", "/buttons/answer_a_hover.png");
-        percentLayout.addPixel(this, answerA, 194, 873, 474, 60);
-        wireAnswer(answerA, 0);
-
-        answerB = new ImagePanel("/buttons/answer_b.png", "/buttons/answer_b_hover.png");
-        percentLayout.addPixel(this, answerB, 647, 873, 474, 60);
-        wireAnswer(answerB, 1);
-
-        answerC = new ImagePanel("/buttons/answer_c.png", "/buttons/answer_c_hover.png");
-        percentLayout.addPixel(this, answerC, 194, 963, 474, 60);
-        wireAnswer(answerC, 2);
-
-        answerD = new ImagePanel("/buttons/answer_d.png", "/buttons/answer_d_hover.png");
-        percentLayout.addPixel(this, answerD, 647, 963, 474, 60);
-        wireAnswer(answerD, 3);
-
-        // --- Lifeline buttons ---
-        traceEliminationButton = new LifelineIconPanel(
-            "/buttons/TraceElButton.png",
-            "/buttons/TraceElButtonDisabled.png"
-        );
-        percentLayout.addPixel(this, traceEliminationButton, 1303, 873, 539, 64);
-        wireLifeline(traceEliminationButton, "TRACE_ELIMINATION");
-
-        systemRerouteButton = new LifelineIconPanel(
-            "/buttons/SysReButton.png",
-            "/buttons/SysReButtonDisabled.png"
-        );
-        percentLayout.addPixel(this, systemRerouteButton, 1303, 957, 539, 64);
-        wireLifeline(systemRerouteButton, "SYSTEM_REROUTE");
-
-        // Special (host-specific)
-        specialLifelineButton = new LifelineIconPanel(
-            "/buttons/placeholder.png",
-            "/buttons/placeholder.png"
-        );
-        percentLayout.addPixel(this, specialLifelineButton, 1303, 790, 539, 64);
-        wireLifeline(specialLifelineButton, "SPECIAL");
-    }
 
 
     public void loadQuestionList(){
