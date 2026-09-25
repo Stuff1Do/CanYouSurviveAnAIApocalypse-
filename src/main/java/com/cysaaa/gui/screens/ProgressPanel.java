@@ -92,6 +92,7 @@ public class ProgressPanel extends BackgroundPanel {
                     "/popups/withdrawConfirm.png",
                     () -> { // TODO: implement GAMEOVER screen
                         StateManager.getInstance().setScreenState(GameState.WITHDRAW);
+                        //TODO: check if reached checkpoint first before game over
                         cardLayout.show(mainPanel, "MENU");
                     }
                 );

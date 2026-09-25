@@ -9,12 +9,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
+
 
 public class QuestionLoader {
 
-    
+    static List<Question> questions;
     public static List<Question> loadQuestions(String resourcePath) {
-        List<Question> questions = new ArrayList<>();
+        questions = new ArrayList<>();
 
         try (InputStream is = QuestionLoader.class.getResourceAsStream(resourcePath);
              BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
@@ -102,5 +107,30 @@ public class QuestionLoader {
         }
         return randomizedQuestions;
 
+    }
+
+        public static List<Question> sortByType(List<Question> questions){
+           
+            HashMap<Question, Integer> typeValue = new HashMap<>();
+            for(Question q: questions){
+                if(q.getType().equals("REMEMBER") || q.getType().equals("UNDERSTAND")){
+                    typeValue.put(q, 1);
+                }else if(q.getType().equals("APPLY") || q.getType().equals("ANALYZE") || q.getType().equals("EVALUATE")){
+                    typeValue.put(q, 2);
+                }else if(q.getType().equals("SYNTHESIS")){
+                    typeValue.put(q, 3);
+                }else{
+                    System.out.println("SORTING QUESTION ERROR: not valid type. "+ q);
+                }
+            }
+
+            List<Question> sortedRandomizedQuestions = new ArrayList<>(questions);
+            sortedRandomizedQuestions.sort(Comparator.comparingInt(typeValue::get));
+
+            return sortedRandomizedQuestions;
+        }
+
+    public static List<Question> getQuestions(){
+        return questions;
     }
 }

@@ -50,6 +50,7 @@ public class GameplayPanel extends BackgroundPanel {
 
     List<Question> questionList;
     List<Question> randomizedQuestions;
+    List<Question> sortedRandomizedQuestions;
 
     
 
@@ -65,7 +66,7 @@ public class GameplayPanel extends BackgroundPanel {
         //load questions & randomize
         loadQuestionList();
         randomizeQuestions(questionList);
-
+        sortQuestions(randomizedQuestions);
         buildUIComponents(); //build everything once, then load questions later
 
         //on load 
@@ -83,11 +84,11 @@ public class GameplayPanel extends BackgroundPanel {
     public void loadCurrentQuestion() {
         int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
 
-        if (randomizedQuestions == null || currentQuestionIndex > randomizedQuestions.size()) {
+        if (sortedRandomizedQuestions == null || currentQuestionIndex > sortedRandomizedQuestions.size()) {
             return; // no more questions, game should have already transitioned screens
         }
 
-        Question question = randomizedQuestions.get(currentQuestionIndex - 1);
+        Question question = sortedRandomizedQuestions.get(currentQuestionIndex - 1);
         setQuestion(question.getType(), question.getQuestionText(), question.getChoices(), "");
     }
 
@@ -119,7 +120,7 @@ public class GameplayPanel extends BackgroundPanel {
 
     private void onAnswerSelected(int index) {
         int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
-        Question question = randomizedQuestions.get(currentQuestionIndex - 1);
+        Question question = sortedRandomizedQuestions.get(currentQuestionIndex - 1);
 
         boolean correct = question.isCorrect(index);
 
@@ -127,7 +128,7 @@ public class GameplayPanel extends BackgroundPanel {
             StateManager.getInstance().setLastAnswer(AnswerState.CORRECT);
             StateManager.getInstance().nextQuestion();
 
-              if (StateManager.getInstance().getCurrentQuestionNumber() > randomizedQuestions.size()) {
+              if (StateManager.getInstance().getCurrentQuestionNumber() > sortedRandomizedQuestions.size()) {
                 // answered all 15 correctly
                 StateManager.getInstance().setScreenState(GameState.VICTORY);
                 cardLayout.show(mainPanel, "VICTORY");
@@ -164,12 +165,16 @@ public class GameplayPanel extends BackgroundPanel {
 
 
     public void loadQuestionList(){
-        questionList = QuestionLoader.loadQuestions("/data/questions.csv");
+        questionList = QuestionLoader.loadQuestions("/data/questions.csv"); 
         
     }
 
     public void randomizeQuestions(List<Question> questions){
-        randomizedQuestions = QuestionLoader.randomizeQuestions(questionList);
+        randomizedQuestions = QuestionLoader.randomizeQuestions(questions);
+    }
+
+    public void sortQuestions(List<Question> questions){
+        sortedRandomizedQuestions = QuestionLoader.sortByType(questions);   
     }
 
     

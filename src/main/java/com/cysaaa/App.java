@@ -6,6 +6,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import com.cysaaa.terminal.TApp;
+import com.cysaaa.util.QuestionLoader;
 import com.cysaaa.gui.screens.*;
 
 public class App {
@@ -14,7 +15,7 @@ public class App {
            TApp terminalApp = new TApp();
            terminalApp.run();
         }else{
-             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         
             JFrame frame = new JFrame("Who wants To Survive an AI Apocalypse?");
             frame.setUndecorated(true);
@@ -48,6 +49,9 @@ public class App {
             GameOverPanel gameOverPanel = new GameOverPanel(cardContainer, cardLayout);
             gameOverPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
+            QuestionLoader.loadQuestions("/data/questions.csv");
+
+
             cardContainer.add(gameOverPanel, "GAME_OVER");
             cardContainer.add(splashScreenPanel, "SPLASH");
             cardContainer.add(mainMenuPanel, "MENU");
@@ -59,7 +63,7 @@ public class App {
 
             frame.setContentPane(cardContainer);
             frame.setVisible(true);
-            cardLayout.show(cardContainer, "SPLASH");
+            //cardLayout.show(cardContainer, "SPLASH");
         }
 
     }

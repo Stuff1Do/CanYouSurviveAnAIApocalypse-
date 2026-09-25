@@ -35,6 +35,7 @@ public class GameOverPanel extends BackgroundPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 StateManager.getInstance().reset();
+                
                 cardLayout.show(mainPanel, "HOST_SELECTION");
             }
         });
