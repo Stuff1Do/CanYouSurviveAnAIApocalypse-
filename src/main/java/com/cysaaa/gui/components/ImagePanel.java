@@ -14,6 +14,7 @@ public class ImagePanel extends JPanel {
     private BufferedImage image;
     private BufferedImage hoverImage;
     private boolean hovering = false;
+    private boolean selected = false;
 
     // Minimum alpha value (0-255) for a pixel to count as "clickable".
     // Pixels with alpha at or below this are treated as transparent/empty space.
@@ -26,6 +27,11 @@ public class ImagePanel extends JPanel {
     // Use this constructor if you don't need a hover state
     public ImagePanel(String imagePath) {
         this(imagePath, null);
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        repaint();
     }
 
     // Use this constructor for a hover-swap image
@@ -66,6 +72,20 @@ public class ImagePanel extends JPanel {
         try {
             URL imgUrl = getClass().getResource(imagePath);
             image = ImageIO.read(imgUrl);
+        } catch (IOException | IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        repaint();
+    }
+
+    public void setHoverImage(String hoverImagePath) {
+        try {
+            if (hoverImagePath != null) {
+                URL hoverUrl = getClass().getResource(hoverImagePath);
+                hoverImage = ImageIO.read(hoverUrl);
+            } else {
+                hoverImage = null;
+            }
         } catch (IOException | IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -128,7 +148,7 @@ public class ImagePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        BufferedImage toDraw = (hovering && hoverImage != null) ? hoverImage : image;
+        BufferedImage toDraw = (hovering || selected) && hoverImage != null ? hoverImage : image;
         if (toDraw != null) {
             g.drawImage(toDraw, 0, 0, getWidth(), getHeight(), this);
         }
