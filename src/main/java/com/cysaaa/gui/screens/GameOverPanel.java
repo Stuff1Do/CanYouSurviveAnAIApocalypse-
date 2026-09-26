@@ -19,7 +19,7 @@ public class GameOverPanel extends BackgroundPanel {
     private ImagePanel playAgainButton;
     private ImagePanel mainMenuButton;
 
-    public GameOverPanel(JPanel mainPanel, CardLayout cardLayout) {
+    public GameOverPanel(JPanel mainPanel, CardLayout cardLayout, GameplayPanel gameplayPanel) {
         super("/backgrounds/game_over.png");
 
         this.mainPanel = mainPanel;
@@ -34,8 +34,7 @@ public class GameOverPanel extends BackgroundPanel {
         playAgainButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                StateManager.getInstance().reset();
-                
+                gameplayPanel.startNewGame();
                 cardLayout.show(mainPanel, "HOST_SELECTION");
             }
         });
@@ -46,7 +45,6 @@ public class GameOverPanel extends BackgroundPanel {
         mainMenuButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                StateManager.getInstance().reset();
                 cardLayout.show(mainPanel, "MENU");
             }
         });

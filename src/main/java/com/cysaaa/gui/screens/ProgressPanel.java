@@ -93,7 +93,7 @@ public class ProgressPanel extends BackgroundPanel {
                     () -> { // TODO: implement GAMEOVER screen
                         StateManager.getInstance().setScreenState(GameState.WITHDRAW);
                         //TODO: check if reached checkpoint first before game over
-                        cardLayout.show(mainPanel, "MENU");
+                        gameplayPanel.checkCheckpoint();
                     }
                 );
 

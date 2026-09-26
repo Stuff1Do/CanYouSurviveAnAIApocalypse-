@@ -64,9 +64,7 @@ public class GameplayPanel extends BackgroundPanel {
         setLayout(percentLayout);      
         
         //load questions & randomize
-        loadQuestionList();
-        randomizeQuestions(questionList);
-        sortQuestions(randomizedQuestions);
+        
         buildUIComponents(); //build everything once, then load questions later
 
         //on load 
@@ -89,6 +87,8 @@ public class GameplayPanel extends BackgroundPanel {
         }
 
         Question question = sortedRandomizedQuestions.get(currentQuestionIndex - 1);
+        System.out.print("(DEV)Correct Answer: ");
+        System.out.println(question.getCorrectIndex());
         setQuestion(question.getType(), question.getQuestionText(), question.getChoices(), "");
     }
 
@@ -138,8 +138,7 @@ public class GameplayPanel extends BackgroundPanel {
             }
         } else {
             StateManager.getInstance().setLastAnswer(AnswerState.WRONG);
-            StateManager.getInstance().setScreenState(GameState.GAME_OVER);
-            cardLayout.show(mainPanel, "GAME_OVER");
+            checkCheckpoint();
         }
     }
 
@@ -163,9 +162,27 @@ public class GameplayPanel extends BackgroundPanel {
         
     }   
 
+    public void checkCheckpoint(){
+        StateManager state = StateManager.getInstance();
+        int progressIndex = state.getCurrentQuestionNumber() - 1;
+
+        if(progressIndex < 8){
+            state.setScreenState(GameState.GAME_OVER);
+            cardLayout.show(mainPanel, "GAME_OVER");
+        }else if(progressIndex >= 8 && progressIndex < 11){
+            state.setScreenState(GameState.FIFTY);
+            cardLayout.show(mainPanel, "CHECKPOINT_1");
+        }else if(progressIndex >= 11 && progressIndex < 15){
+            state.setScreenState(GameState.SEVENTY_FIVE);
+            cardLayout.show(mainPanel, "CHECKPOINT_2");
+        }else{
+            System.out.println("CHECKPOINT ERROR: something has gone wrong idk, debug idiot");
+        }
+    }
+
 
     public void loadQuestionList(){
-        questionList = QuestionLoader.loadQuestions("/data/questions.csv"); 
+        questionList = QuestionLoader.getQuestions();
         
     }
 
@@ -175,6 +192,14 @@ public class GameplayPanel extends BackgroundPanel {
 
     public void sortQuestions(List<Question> questions){
         sortedRandomizedQuestions = QuestionLoader.sortByType(questions);   
+    }
+
+    public void startNewGame() {
+        StateManager.getInstance().reset();  
+        loadQuestionList();
+        randomizeQuestions(questionList);
+        sortQuestions(randomizedQuestions);
+        loadCurrentQuestion();              
     }
 
     

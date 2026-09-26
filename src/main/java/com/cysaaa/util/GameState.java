@@ -6,5 +6,7 @@ public enum GameState {
     PLAYING,
     WITHDRAW,
     GAME_OVER,
+    FIFTY,
+    SEVENTY_FIVE,
     VICTORY,
 }

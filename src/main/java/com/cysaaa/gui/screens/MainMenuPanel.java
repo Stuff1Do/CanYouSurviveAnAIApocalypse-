@@ -10,7 +10,7 @@ import com.cysaaa.util.StateManager;
 
 public class MainMenuPanel extends BackgroundPanel {
 
-    public MainMenuPanel(JPanel cardContainer, CardLayout cardLayout) {
+    public MainMenuPanel(JPanel cardContainer, CardLayout cardLayout, GameplayPanel gameplayPanel) {
         super("/backgrounds/MainMenu.png");
 
         PercentLayout layout = new PercentLayout();
@@ -23,6 +23,7 @@ public class MainMenuPanel extends BackgroundPanel {
         playButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                gameplayPanel.startNewGame();
                 cardLayout.show(cardContainer, "HOST_SELECTION");
             }
         });
