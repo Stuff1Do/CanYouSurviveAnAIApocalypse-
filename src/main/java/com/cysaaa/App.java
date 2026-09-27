@@ -12,6 +12,7 @@ import com.cysaaa.gui.GameplayPanel;
 import com.cysaaa.gui.HostSelectionPanel;
 import com.cysaaa.gui.InstructionsPanel;
 import com.cysaaa.gui.SplashScreenPanel;
+import com.cysaaa.gui.EndingPanel;
 
 public class App {
     public static void main(String[] args) {
@@ -50,12 +51,21 @@ public class App {
             HostSelectionPanel hostSelectionPanel = new HostSelectionPanel(cardContainer, cardLayout, progressPanel); // NEW param
             hostSelectionPanel.setBounds(0, 0, screenSize.width, screenSize.height);
 
+            EndingPanel ending50 = new EndingPanel(cardContainer, cardLayout, "/endings/50.png");
+            EndingPanel ending75 = new EndingPanel(cardContainer, cardLayout, "/endings/75.png");
+            EndingPanel ending100 = new EndingPanel(cardContainer, cardLayout, "/endings/100.png");
+            EndingPanel endingGameOver = new EndingPanel(cardContainer, cardLayout, "/endings/game over1.png");
+
             cardContainer.add(splashScreenPanel, "SPLASH");
             cardContainer.add(mainMenuPanel, "MENU");
             cardContainer.add(instructionsPanel, "INSTRUCTIONS");
             cardContainer.add(hostSelectionPanel, "HOST_SELECTION");
             cardContainer.add(progressPanel, "PROGRESS");
             cardContainer.add(gameplayPanel, "GAMEPLAY");
+            cardContainer.add(ending50, "ENDING_50");
+            cardContainer.add(ending75, "ENDING_75");
+            cardContainer.add(ending100, "ENDING_100");
+            cardContainer.add(endingGameOver, "ENDING_GAME_OVER");
 
             frame.setContentPane(cardContainer);
             frame.setVisible(true);

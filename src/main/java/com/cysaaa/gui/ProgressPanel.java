@@ -90,7 +90,8 @@ public class ProgressPanel extends BackgroundPanel {
                     "/popups/withdrawConfirm.png",
                     () -> { // onYes
                         StateManager.getInstance().setScreenState(GameState.WITHDRAW);
-                        cardLayout.show(mainPanel, "MENU");
+                        cardLayout.show(mainPanel, EndingPanel.cardForCheckpoint(
+                            StateManager.getInstance().getHighestCheckpoint()));
                     }
                 );
 

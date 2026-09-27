@@ -95,11 +95,12 @@ public class TApp {
 
             // only increment count if the game is still active
             if (StateManager.getInstance().getScreenState() != GameState.GAME_OVER && StateManager.getInstance().getWithdrawState() != GameState.WITHDRAW) {
+                StateManager.getInstance().updateCheckpoint(StateManager.getInstance().getCurrentQuestionNumber());
                 StateManager.getInstance().nextQuestion();
             }
         }
 
-        if (StateManager.getInstance().getCurrentQuestionNumber() > 15) { //would be even better to check if question is #15 and check if correct
+        if (StateManager.getInstance().getCurrentQuestionNumber() > 15) {
             StateManager.getInstance().setScreenState(GameState.VICTORY); // but dont have questions yet
         }
 
@@ -142,8 +143,7 @@ public class TApp {
         }
 
         
-        //TODO: make into new function
-        boolean correct = checkAnswer(question, choice); 
+        boolean correct = resolveAnswer(question, choice);
 
         if(twoGuesses && !correct){
             twoGuesses = false;
@@ -179,6 +179,15 @@ public class TApp {
             System.out.println("Invalid input, counted as wrong.");
             return false;
         }
+    }
+
+    public boolean resolveAnswer(Question question, String choice) {
+        boolean correct = checkAnswer(question, choice);
+        StateManager.getInstance().setLastAnswer(correct ? AnswerState.CORRECT : AnswerState.WRONG);
+        if (!correct) {
+            StateManager.getInstance().setScreenState(GameState.GAME_OVER);
+        }
+        return correct;
     }
 
     public void printQuestionMenu(Question question, int currentQuestionIndex){
@@ -353,12 +362,12 @@ public class TApp {
 
     
     public void checkCheckpoint(){
-    
-        int progress = StateManager.getInstance().getCurrentQuestionNumber();
-        if(progress >= 7 && progress < 11){
-            System.out.println("You survived as a Cybernetic Core!");
-        }else if(progress >= 11 && progress < 15){
+
+        int checkpoint = StateManager.getInstance().getHighestCheckpoint();
+        if(checkpoint >= 75 && checkpoint < 100){
             System.out.println("You survived as a Synthetic Lifeform!");
+        }else if(checkpoint >= 50){
+            System.out.println("You survived as a Cybernetic Core!");
         }else{
             System.out.println("You did not survive an AI Apocalypse.");
         }

@@ -18,6 +18,7 @@ public class StateManager {
     private AnswerState lastAnswer = AnswerState.UNANSWERED;
     private GameState withdrawState;
     private Host currentHost;
+    private int highestCheckpoint;
 
     private boolean traceEliminationUsed = false;
     private boolean systemRerouteUsed = false;
@@ -55,6 +56,20 @@ public class StateManager {
     public void nextQuestion() { 
         currentQuestionNumber++; 
     }   
+
+    public int getHighestCheckpoint() {
+        return highestCheckpoint;
+    }
+
+    public void updateCheckpoint(int questionNumber) {
+        if (questionNumber >= 15) {
+            highestCheckpoint = 100;
+        } else if (questionNumber >= 11) {
+            highestCheckpoint = Math.max(highestCheckpoint, 75);
+        } else if (questionNumber >= 8) {
+            highestCheckpoint = Math.max(highestCheckpoint, 50);
+        }
+    }
 
     public void setLastAnswer(AnswerState result) { 
         lastAnswer = result; 
@@ -105,6 +120,7 @@ public class StateManager {
         lastAnswer = AnswerState.UNANSWERED;
         withdrawState = null;
         currentHost = null;
+        highestCheckpoint = 0;
         traceEliminationUsed = false;
         systemRerouteUsed = false;
         specialLifelineUsed = false;

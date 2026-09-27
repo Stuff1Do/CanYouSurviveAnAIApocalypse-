@@ -2,6 +2,9 @@ package com.cysaaa.gui;
 
 import com.cysaaa.util.Host;
 import com.cysaaa.util.GameState;
+import com.cysaaa.util.AnswerState;
+import com.cysaaa.util.Question;
+import com.cysaaa.util.QuestionLoader;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,6 +12,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GameplayPanel extends BackgroundPanel {
 
@@ -41,6 +47,8 @@ public class GameplayPanel extends BackgroundPanel {
     private LifelineIconPanel traceEliminationButton;
     private LifelineIconPanel systemRerouteButton;
     private LifelineIconPanel specialLifelineButton;
+    private List<Question> questions = new ArrayList<>();
+    private Question currentQuestion;
 
     
 
@@ -54,7 +62,6 @@ public class GameplayPanel extends BackgroundPanel {
         setLayout(percentLayout);
 
         // --- Question type banner ---
-        // TODO: Change JLabel text for question type banner depending on the question.
         typeLabel = new JLabel("TYPE: REMEMBER", SwingConstants.CENTER);
         typeLabel.setForeground(Color.WHITE);
         typeLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
@@ -74,7 +81,6 @@ public class GameplayPanel extends BackgroundPanel {
         percentLayout.addPixel(this, choicesLabel, 213, 450, 976, 160);
 
         // --- Host speech bubble ---
-        // TODO: Change dialogue label text depending on the host label.
         dialogueLabel = new JLabel("<html>Host dialogue goes here.</html>");
         dialogueLabel.setForeground(Color.WHITE);
         dialogueLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
@@ -152,18 +158,46 @@ public class GameplayPanel extends BackgroundPanel {
         });
     }
 
-    // TODO: hook up real lifeline effects (eliminate choices, swap question, host effect)
     private void onLifelineClicked(String lifelineKey, LifelineIconPanel button) {
         if (button.isUsed()) return; // already used, ignore clicks
-        System.out.println("Lifeline used: " + lifelineKey);
         button.setUsed(true);
-        // e.g. StateManager.getInstance().markLifelineUsed(lifelineKey);
+        StateManager state = StateManager.getInstance();
+        if ("TRACE_ELIMINATION".equals(lifelineKey)) {
+            state.useTraceElimination();
+        } else if ("SYSTEM_REROUTE".equals(lifelineKey)) {
+            state.useSystemReroute();
+            loadNextQuestion();
+        } else if ("SPECIAL".equals(lifelineKey)) {
+            state.useSpecialLifeline();
+            dialogueLabel.setText("<html>Neural Prompt: " + currentQuestion.getHint() + "</html>");
+        }
+        syncWithState();
+        repaint();
     }
 
-    // TODO: hook up to Question/scoring logic once that exists
     private void onAnswerSelected(int index) {
-        System.out.println("Answer selected: " + index);
-        progressPanel.syncWithState(); // NEW — refresh before showing
+        if (currentQuestion == null) return;
+        StateManager state = StateManager.getInstance();
+        int answeredQuestion = state.getCurrentQuestionNumber();
+        if (answeredQuestion >= 8 && answeredQuestion < 15) {
+            state.updateCheckpoint(answeredQuestion);
+        }
+        if (!currentQuestion.isCorrect(index)) {
+            state.setLastAnswer(AnswerState.WRONG);
+            state.setScreenState(GameState.GAME_OVER);
+            cardLayout.show(mainPanel, EndingPanel.cardForCheckpoint(state.getHighestCheckpoint()));
+            return;
+        }
+
+        state.setLastAnswer(AnswerState.CORRECT);
+        state.updateCheckpoint(answeredQuestion);
+        if (answeredQuestion >= 15) {
+            state.setScreenState(GameState.VICTORY);
+            cardLayout.show(mainPanel, "ENDING_100");
+            return;
+        }
+        state.nextQuestion();
+        progressPanel.syncWithState();
         cardLayout.show(mainPanel, "PROGRESS");
     }
 
@@ -184,7 +218,25 @@ public class GameplayPanel extends BackgroundPanel {
         systemRerouteButton.setUsed(state.isSystemRerouteUsed());
         specialLifelineButton.setUsed(state.isSpecialLifelineUsed());
 
-        // TODO: pull real question text/choices/type/dialogue once Question class exists
+        if (questions.isEmpty()) {
+            questions = QuestionLoader.randomizeQuestions(
+                QuestionLoader.loadQuestions("/data/questions.csv"));
+        }
+        int questionIndex = state.getCurrentQuestionNumber() - 1;
+        if (questionIndex >= 0 && questionIndex < questions.size()) {
+            currentQuestion = questions.get(questionIndex);
+            String dialogue = host == null ? "Prepare to evolve." :
+                "Host online. Analyze the next threat.";
+            setQuestion(currentQuestion.getType(), currentQuestion.getQuestionText(),
+                currentQuestion.getChoices(), dialogue);
+        }
+    }
+
+    private void loadNextQuestion() {
+        if (questions.isEmpty()) return;
+        Collections.rotate(questions.subList(StateManager.getInstance().getCurrentQuestionNumber() - 1,
+            questions.size()), -1);
+        syncWithState();
     }
 
     // Call this once question data exists, to populate the screen
