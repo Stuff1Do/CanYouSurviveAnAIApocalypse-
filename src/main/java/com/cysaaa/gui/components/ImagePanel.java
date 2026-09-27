@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.net.URL;
@@ -119,6 +120,14 @@ public class ImagePanel extends JPanel {
     // so transparent parts of the image no longer respond to mouse events.
     public void setPixelPreciseHitTest(boolean enabled) {
         this.pixelPreciseHitTest = enabled;
+    }
+
+    public void setHoverHighlight(boolean enabled) {
+        if (enabled && image != null && hoverImage == null) {
+            RescaleOp brighten = new RescaleOp(1.12f, 18f, null);
+            hoverImage = brighten.filter(image, null);
+        }
+        repaint();
     }
 
     @Override

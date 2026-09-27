@@ -26,7 +26,31 @@ public class VictoryScreen extends BackgroundPanel {
         this.cardLayout = cardLayout;
 
         percentLayout = new PercentLayout();
+        percentLayout.setDesignSize(1920, 1080);
         setLayout(percentLayout);
 
+        ImagePanel mainMenuButton = new ImagePanel("/endings/mainmenu1.png");
+        mainMenuButton.setPixelPreciseHitTest(true);
+        mainMenuButton.setHoverHighlight(true);
+        mainMenuButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                StateManager.getInstance().reset();
+                cardLayout.show(mainPanel, "MENU");
+            }
+        });
+        percentLayout.addPixel(this, mainMenuButton, 382, 732, 369, 97);
+
+        ImagePanel playAgainButton = new ImagePanel("/endings/playagain2.png");
+        playAgainButton.setPixelPreciseHitTest(true);
+        playAgainButton.setHoverHighlight(true);
+        playAgainButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                StateManager.getInstance().reset();
+                cardLayout.show(mainPanel, "HOST_SELECTION");
+            }
+        });
+        percentLayout.addPixel(this, playAgainButton, 792, 732, 369, 97);
     }
 }

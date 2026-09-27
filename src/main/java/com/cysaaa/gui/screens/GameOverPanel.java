@@ -26,11 +26,14 @@ public class GameOverPanel extends BackgroundPanel {
         this.cardLayout = cardLayout;
 
         percentLayout = new PercentLayout();
+        percentLayout.setDesignSize(1920, 1080);
         setLayout(percentLayout);
 
         // Play Again -> reset state, back to host selection
-        playAgainButton = new ImagePanel("/buttons/play_again.png", "/buttons/play_again_hover.png");
-        percentLayout.addPixel(this, playAgainButton, 978, 779, 377, 96); 
+        playAgainButton = new ImagePanel("/endings/playagain3.png");
+        playAgainButton.setPixelPreciseHitTest(true);
+        playAgainButton.setHoverHighlight(true);
+        percentLayout.addPixel(this, playAgainButton, 978, 772, 369, 98);
         playAgainButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -40,11 +43,14 @@ public class GameOverPanel extends BackgroundPanel {
         });
 
         // Main Menu -> back to main menu
-        mainMenuButton = new ImagePanel("/buttons/main_menu_button.png", "/buttons/main_menu_button_hover.png");
-        percentLayout.addPixel(this, mainMenuButton, 567, 772, 369, 96);
+        mainMenuButton = new ImagePanel("/endings/mainmenu1.png");
+        mainMenuButton.setPixelPreciseHitTest(true);
+        mainMenuButton.setHoverHighlight(true);
+        percentLayout.addPixel(this, mainMenuButton, 567, 772, 369, 98);
         mainMenuButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                StateManager.getInstance().reset();
                 cardLayout.show(mainPanel, "MENU");
             }
         });

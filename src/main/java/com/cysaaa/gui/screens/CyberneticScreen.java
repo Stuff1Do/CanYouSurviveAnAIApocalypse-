@@ -26,7 +26,19 @@ public class CyberneticScreen extends BackgroundPanel {
         this.cardLayout = cardLayout;
 
         percentLayout = new PercentLayout();
+        percentLayout.setDesignSize(1920, 1080);
         setLayout(percentLayout);
 
+        ImagePanel exitButton = new ImagePanel("/endings/exit1.png");
+        exitButton.setPixelPreciseHitTest(true);
+        exitButton.setHoverHighlight(true);
+        exitButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                StateManager.getInstance().reset();
+                cardLayout.show(mainPanel, "MENU");
+            }
+        });
+        percentLayout.addPixel(this, exitButton, 776, 748, 451, 140);
     }
 }
