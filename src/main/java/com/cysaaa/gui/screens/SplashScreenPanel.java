@@ -18,8 +18,8 @@ import com.cysaaa.util.StateManager;
 
 
 public class SplashScreenPanel extends JPanel {
-    private static final int SPLASH_DURATION_MS = 14000;
-    private static final int FADE_DURATION_MS = 700;
+    private static final int SPLASH_DURATION_MS = 9500;
+    private static final int FADE_DURATION_MS = 660;
     private static final int FRAME_MS = 40;
     private static final String LOADING_FONT = "Chakra Petch";
     private static final Color LOADING_PINK = new Color(255, 20, 190);
