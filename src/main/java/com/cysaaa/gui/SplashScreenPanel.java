@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class SplashScreenPanel extends JPanel {
-    private static final int SPLASH_DURATION_MS = 14000;
+    private static final int SPLASH_DURATION_MS = 9000;
     private static final int FADE_DURATION_MS = 700;
     private static final int FRAME_MS = 40;
     private static final String LOADING_FONT = "Chakra Petch";
@@ -156,7 +156,7 @@ public class SplashScreenPanel extends JPanel {
         g.setFont(new Font(LOADING_FONT, Font.BOLD, 24));
         int textX = centerX - g.getFontMetrics().stringWidth(loadingText) / 2;
 
-        g.setColor(LOADING_PINK);
+        g.setColor(Color.WHITE);
         g.drawString(loadingText, textX, baseline);
     }
 }
