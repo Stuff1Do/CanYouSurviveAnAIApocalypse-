@@ -11,7 +11,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import com.cysaaa.gui.components.*;
-import com.cysaaa.util.*;
+import com.cysaaa.util.*;   
+import com.cysaaa.gui.components.*;
 
 
 public class GameplayPanel extends BackgroundPanel {
@@ -259,28 +260,28 @@ public class GameplayPanel extends BackgroundPanel {
     }
 
     private void handleParallelSelection(int index) {
-    if (parallelSelections.contains(index)) return; // ignore re-click of same choice
+        if (parallelSelections.contains(index)) return; // ignore re-click of same choice
 
-    parallelSelections.add(index);
-    getAnswerButtons()[index].setSelected(true); // highlight persists after mouse leaves
+        parallelSelections.add(index);
+        getAnswerButtons()[index].setSelected(true); // highlight persists after mouse leaves
 
-    if (parallelSelections.size() < 2) {
-        System.out.println("First pick recorded: " + index + " — pick one more.");
-        return;
+        if (parallelSelections.size() < 2) {
+            System.out.println("First pick recorded: " + index + " — pick one more.");
+            return;
+        }
+
+        // Both picks in — evaluate. Correct if EITHER pick matches (adjust if you want both-correct).
+        Question question = getCurrentQuestion();
+        boolean correct = parallelSelections.stream().anyMatch(question::isCorrect);
+
+        parallelProcessingActive = false;
+        parallelSelections.clear();
+        for (ImagePanel btn : getAnswerButtons()) {
+            btn.setSelected(false); // clear highlights before moving to next question/screen
+        }
+
+        resolveAnswer(correct);
     }
-
-    // Both picks in — evaluate. Correct if EITHER pick matches (adjust if you want both-correct).
-    Question question = getCurrentQuestion();
-    boolean correct = parallelSelections.stream().anyMatch(question::isCorrect);
-
-    parallelProcessingActive = false;
-    parallelSelections.clear();
-    for (ImagePanel btn : getAnswerButtons()) {
-        btn.setSelected(false); // clear highlights before moving to next question/screen
-    }
-
-    resolveAnswer(correct);
-}
 
     private void evaluateAnswer(int index) {
         Question question = getCurrentQuestion();

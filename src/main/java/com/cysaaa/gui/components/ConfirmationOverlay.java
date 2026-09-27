@@ -1,4 +1,4 @@
-package com.cysaaa.gui.screens;
+package com.cysaaa.gui.components;
 
 import java.awt.Container;
 import java.awt.event.MouseAdapter;
