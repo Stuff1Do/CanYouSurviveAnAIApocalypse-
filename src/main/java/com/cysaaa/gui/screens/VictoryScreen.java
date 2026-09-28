@@ -29,7 +29,7 @@ public class VictoryScreen extends BackgroundPanel {
         percentLayout.setDesignSize(1920, 1080);
         setLayout(percentLayout);
 
-        ImagePanel mainMenuButton = new ImagePanel("/endings/mainmenu1.png");
+        ImagePanel mainMenuButton = new ImagePanel("/endings/mainmenu1.png", "/endings/mainmenu1_hover.png");
         mainMenuButton.setPixelPreciseHitTest(true);
         mainMenuButton.setHoverHighlight(true);
         mainMenuButton.addMouseListener(new MouseAdapter() {
@@ -41,7 +41,7 @@ public class VictoryScreen extends BackgroundPanel {
         });
         percentLayout.addPixel(this, mainMenuButton, 382, 732, 369, 97);
 
-        ImagePanel playAgainButton = new ImagePanel("/endings/playagain2.png");
+        ImagePanel playAgainButton = new ImagePanel("/endings/playagain2.png", "/endings/playagain2_hover.png");
         playAgainButton.setPixelPreciseHitTest(true);
         playAgainButton.setHoverHighlight(true);
         playAgainButton.addMouseListener(new MouseAdapter() {

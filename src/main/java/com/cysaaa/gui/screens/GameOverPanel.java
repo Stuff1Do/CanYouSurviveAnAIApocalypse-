@@ -30,7 +30,7 @@ public class GameOverPanel extends BackgroundPanel {
         setLayout(percentLayout);
 
         // Play Again -> reset state, back to host selection
-        playAgainButton = new ImagePanel("/endings/playagain3.png");
+        playAgainButton = new ImagePanel("/endings/playagain3.png", "playagain3_hover.png");
         playAgainButton.setPixelPreciseHitTest(true);
         playAgainButton.setHoverHighlight(true);
         percentLayout.addPixel(this, playAgainButton, 978, 772, 369, 98);
@@ -43,7 +43,7 @@ public class GameOverPanel extends BackgroundPanel {
         });
 
         // Main Menu -> back to main menu
-        mainMenuButton = new ImagePanel("/endings/mainmenu1.png");
+        mainMenuButton = new ImagePanel("/endings/mainmenu1.png", "/endings/mainmenu1_hover.png");
         mainMenuButton.setPixelPreciseHitTest(true);
         mainMenuButton.setHoverHighlight(true);
         percentLayout.addPixel(this, mainMenuButton, 567, 772, 369, 98);

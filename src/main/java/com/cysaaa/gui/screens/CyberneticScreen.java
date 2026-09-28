@@ -29,7 +29,7 @@ public class CyberneticScreen extends BackgroundPanel {
         percentLayout.setDesignSize(1920, 1080);
         setLayout(percentLayout);
 
-        ImagePanel exitButton = new ImagePanel("/endings/exit1.png");
+        ImagePanel exitButton = new ImagePanel("/endings/exit1.png", "/endings/exit1_hover.png");
         exitButton.setPixelPreciseHitTest(true);
         exitButton.setHoverHighlight(true);
         exitButton.addMouseListener(new MouseAdapter() {
