@@ -77,12 +77,12 @@ public class GameplayPanel extends BackgroundPanel {
             @Override
             public void componentShown(ComponentEvent e) {
                 
-                
-
                 syncWithState();
                 loadCurrentQuestion();
             }
         });
+
+        
     }
 
     public void loadCurrentQuestion() {
@@ -191,9 +191,7 @@ public class GameplayPanel extends BackgroundPanel {
             case SWITCH_QUESTION -> applySwitchQuestion();
             case PARALLEL_PROCESSING -> applyParallelProcessing();
             case MEMORY_FLUSH -> applyMemoryFlush();
-            case NEURAL_PROMPT -> {
-                // TODO: show AI-generated hint text based on question.getHint()
-            }
+            case NEURAL_PROMPT -> applyNeuralPrompt();
         }
 
         button.setUsed(true);
@@ -201,6 +199,11 @@ public class GameplayPanel extends BackgroundPanel {
 
         //after using lifeline, reset lifeline sate
         StateManager.getInstance().resetLifelineUsedState();
+    }
+
+    private void applyNeuralPrompt(){
+        Question question = getCurrentQuestion();
+        dialogue.type(question.getHint());
     }
 
     // --- Lifeline effects ---
@@ -464,6 +467,14 @@ public class GameplayPanel extends BackgroundPanel {
         dialogueLabel.setForeground(Color.WHITE);
         dialogueLabel.setVerticalAlignment(SwingConstants.TOP);
         percentLayout.addPixel(this, dialogueLabel, 1332, 119, 495, 237);
+
+        dialogueLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                dialogue.skipToEnd();
+            }
+        });
+
 
         hostImage = new ImagePanel();
         percentLayout.addPixel(this, hostImage, 1351, 260, 436, 507);
