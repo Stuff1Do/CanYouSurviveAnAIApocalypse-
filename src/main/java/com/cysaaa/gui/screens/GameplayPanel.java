@@ -11,8 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import com.cysaaa.gui.components.*;
-import com.cysaaa.util.*;   
-import com.cysaaa.gui.components.*;
+import com.cysaaa.util.*;
 
 
 public class GameplayPanel extends BackgroundPanel {
@@ -35,6 +34,7 @@ public class GameplayPanel extends BackgroundPanel {
 
     // Host speech bubble
     private JLabel dialogueLabel;
+    private DialogueUtil dialogue;
 
     // Host image
     private ImagePanel hostImage;
@@ -57,6 +57,7 @@ public class GameplayPanel extends BackgroundPanel {
     private boolean parallelProcessingActive = false;
 
     private final Random random = new Random();
+    private boolean answerLock = false;
 
 
     public GameplayPanel(JPanel mainPanel, CardLayout cardLayout) {
@@ -68,11 +69,16 @@ public class GameplayPanel extends BackgroundPanel {
         percentLayout = new PercentLayout();
         setLayout(percentLayout);
 
-        buildUIComponents(); //build everything once, then load questions later
+        buildUIComponents(); // build everything once, then load questions later
+
+        dialogue = new DialogueUtil(dialogueLabel, 30, 420, "/fonts/Exo2-SemiBold.ttf", 18f);
 
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
+                
+                
+
                 syncWithState();
                 loadCurrentQuestion();
             }
@@ -80,6 +86,7 @@ public class GameplayPanel extends BackgroundPanel {
     }
 
     public void loadCurrentQuestion() {
+        answerLock = false;
         int currentQuestionIndex = StateManager.getInstance().getCurrentQuestionNumber();
 
         if (sortedRandomizedQuestions == null || currentQuestionIndex > sortedRandomizedQuestions.size()) {
@@ -87,11 +94,33 @@ public class GameplayPanel extends BackgroundPanel {
         }
 
         Question question = sortedRandomizedQuestions.get(currentQuestionIndex - 1);
+        System.out.println("QUESTION #" + currentQuestionIndex + ": ");
         System.out.print("(DEV)Correct Answer: ");
-        System.out.println(question.getCorrectIndex());
-        setQuestion(question.getType(), question.getQuestionText(), question.getChoices(), "");
+        System.out.println(question.getCorrectIndex() + 1);
+        setQuestion(question.getType(), question.getQuestionText(), question.getChoices());
+
+        dialogueOnQuestionLoad();
 
         resetPerQuestionState();
+    }
+
+    public void dialogueOnQuestionLoad(){
+        
+        Host host = StateManager.getInstance().getCurrentHost();
+        StateManager state = StateManager.getInstance();
+
+        if(state.isLifelineUsedState() != null){
+            return;
+        }
+        if (host != null) {
+            //TODO: do more if statements for each question
+            //this is also for system reroute so it doesnt get overwritten by loadCurrentQuestion
+            //will eventually differentiate playing and game start, just need to make dialogue for both
+            if(state.getScreenState().equals(GameState.PLAYING)){
+                dialogue.type(host.getLine(state.getScreenState()));
+            }
+            
+        }
     }
 
     // Clears effects that only apply to a single question (50:50 eliminations,
@@ -117,13 +146,13 @@ public class GameplayPanel extends BackgroundPanel {
     }
 
     private void wireAnswer(ImagePanel button, int index) {
-    button.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            onAnswerSelected(index);
-        }
-    });
-}
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                onAnswerSelected(index);
+            }
+        });
+    }
 
     // fixedLifeline: pass the exact Lifeline for baseline buttons, or null for
     // the special button, whose Lifeline is resolved at click-time from the host.
@@ -143,12 +172,18 @@ public class GameplayPanel extends BackgroundPanel {
     }
 
     private void onLifelineClicked(Lifeline lifeline, LifelineIconPanel button) {
+        if (answerLock) return;
         if (button.isUsed()) return;
         if (StateManager.getInstance().isLifelineUsed(lifeline)) return;
 
         if (lifeline == Lifeline.PARALLEL_PROCESSING) {
-        showParallelProcessingConfirmation(lifeline, button);
-        return; // marking used + applying effect happens inside the OK callback
+            showParallelProcessingConfirmation(lifeline, button);
+            return; // marking used + applying effect happens inside the OK callback
+        }
+
+        Host host = StateManager.getInstance().getCurrentHost();
+        if (host != null) {
+            dialogue.type(host.getLine(lifeline));
         }
 
         switch (lifeline) {
@@ -163,6 +198,9 @@ public class GameplayPanel extends BackgroundPanel {
 
         button.setUsed(true);
         StateManager.getInstance().useLifeline(lifeline);
+
+        //after using lifeline, reset lifeline sate
+        StateManager.getInstance().resetLifelineUsedState();
     }
 
     // --- Lifeline effects ---
@@ -252,6 +290,7 @@ public class GameplayPanel extends BackgroundPanel {
     // --- Answer handling ---
 
     private void onAnswerSelected(int index) {
+        if (answerLock) return;
         if (parallelProcessingActive) {
             handleParallelSelection(index);
             return;
@@ -296,11 +335,20 @@ public class GameplayPanel extends BackgroundPanel {
 
             if (StateManager.getInstance().getCurrentQuestionNumber() > sortedRandomizedQuestions.size()) {
                 StateManager.getInstance().setScreenState(GameState.VICTORY);
-                cardLayout.show(mainPanel, "VICTORY");
+                dialogue.type(StateManager.getInstance().getCurrentHost().getLine(StateManager.getInstance().getScreenState()));
+                answerLock = true;
+                runAfterDelay(3000, () -> {
+                    cardLayout.show(mainPanel, "VICTORY");
+                });
             } else {
-                progressPanel.syncWithState();
-                cardLayout.show(mainPanel, "PROGRESS");
+                dialogue.type(StateManager.getInstance().getCurrentHost().getLine(StateManager.getInstance().getLastAnswer()));
+                answerLock = true;
+                runAfterDelay(3000, () -> {
+                    progressPanel.syncWithState();
+                    cardLayout.show(mainPanel, "PROGRESS");
+                });
             }
+
         } else {
             StateManager.getInstance().setLastAnswer(AnswerState.WRONG);
             checkCheckpoint();
@@ -331,17 +379,24 @@ public class GameplayPanel extends BackgroundPanel {
     public void checkCheckpoint(){
         StateManager state = StateManager.getInstance();
         int progressIndex = state.getCurrentQuestionNumber() - 1;
+        Host host = StateManager.getInstance().getCurrentHost();
 
-        if(progressIndex < 8){
+        if (progressIndex < 8) {
             state.setScreenState(GameState.GAME_OVER);
-            cardLayout.show(mainPanel, "GAME_OVER");
-        }else if(progressIndex >= 8 && progressIndex < 11){
+            dialogue.type(host.getLine(StateManager.getInstance().getScreenState()));
+            runAfterDelay(3000, () -> cardLayout.show(mainPanel, "GAME_OVER"));
+
+        } else if (progressIndex >= 8 && progressIndex < 11) {
             state.setScreenState(GameState.FIFTY);
-            cardLayout.show(mainPanel, "CHECKPOINT_1");
-        }else if(progressIndex >= 11 && progressIndex < 15){
+            dialogue.type(host.getLine(StateManager.getInstance().getScreenState()));
+            runAfterDelay(3000, () -> cardLayout.show(mainPanel, "CHECKPOINT_1"));
+
+        } else if (progressIndex >= 11 && progressIndex < 15) {
             state.setScreenState(GameState.SEVENTY_FIVE);
-            cardLayout.show(mainPanel, "CHECKPOINT_2");
-        }else{
+            dialogue.type(host.getLine(StateManager.getInstance().getScreenState()));
+            runAfterDelay(3000, () -> cardLayout.show(mainPanel, "CHECKPOINT_2"));
+
+        } else {
             System.out.println("CHECKPOINT ERROR: something has gone wrong idk, debug idiot");
         }
     }
@@ -366,7 +421,8 @@ public class GameplayPanel extends BackgroundPanel {
         loadCurrentQuestion();
     }
 
-    public void setQuestion(String type, String questionText, String[] choices, String hostDialogue) {
+    // hostDialogue param removed — dialogue is now set separately via dialogue.type()
+    public void setQuestion(String type, String questionText, String[] choices) {
         typeLabel.setText("TYPE: " + type.toUpperCase());
         questionTextLabel.setText("<html>" + questionText + "</html>");
 
@@ -377,10 +433,13 @@ public class GameplayPanel extends BackgroundPanel {
         }
         sb.append("</html>");
         choicesLabel.setText(sb.toString());
-
-        dialogueLabel.setText("<html>" + hostDialogue + "</html>");
     }
 
+    private void runAfterDelay(int delayMillis, Runnable action) {
+        Timer timer = new Timer(delayMillis, e -> action.run());
+        timer.setRepeats(false);
+        timer.start();
+    }
 
     private void buildUIComponents() {
         typeLabel = new JLabel("", SwingConstants.CENTER);
@@ -400,9 +459,9 @@ public class GameplayPanel extends BackgroundPanel {
         choicesLabel.setVerticalAlignment(SwingConstants.TOP);
         percentLayout.addPixel(this, choicesLabel, 213, 450, 976, 160);
 
+        // font + typewriter now handled by DialogueUtil, constructed after this method returns
         dialogueLabel = new JLabel();
         dialogueLabel.setForeground(Color.WHITE);
-        dialogueLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         dialogueLabel.setVerticalAlignment(SwingConstants.TOP);
         percentLayout.addPixel(this, dialogueLabel, 1332, 119, 495, 237);
 

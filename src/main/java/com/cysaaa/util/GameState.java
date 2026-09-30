@@ -9,4 +9,6 @@ public enum GameState {
     FIFTY,
     SEVENTY_FIVE,
     VICTORY,
+    GAME_START,
+    LIFELINE_USE,
 }
