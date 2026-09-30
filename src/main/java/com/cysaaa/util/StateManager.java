@@ -18,6 +18,7 @@ public class StateManager {
     private AnswerState lastAnswer = AnswerState.UNANSWERED;
     private GameState withdrawState;
     private Host currentHost;
+    private GameState lifelineUsed;
 
     private StateManager() {}
 
@@ -68,12 +69,21 @@ public class StateManager {
         return withdrawState;
     }
 
+    public GameState isLifelineUsedState(){
+        return lifelineUsed;
+    }
+
+    public void resetLifelineUsedState(){
+        lifelineUsed = null;
+    }
+
 
     public boolean isLifelineUsed(Lifeline lifeline) {
         return usedLifelines.contains(lifeline);
     }
 
     public void useLifeline(Lifeline lifeline) {
+        lifelineUsed = GameState.LIFELINE_USE;
         usedLifelines.add(lifeline);
     }
 
