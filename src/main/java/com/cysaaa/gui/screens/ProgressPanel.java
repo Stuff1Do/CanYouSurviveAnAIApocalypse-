@@ -1,6 +1,4 @@
 package com.cysaaa.gui.screens;
-import com.cysaaa.util.Host;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -10,7 +8,6 @@ import java.awt.event.MouseEvent;
 
 import com.cysaaa.gui.components.*;
 import com.cysaaa.util.*;
-import com.cysaaa.util.StateManager;
 
 
 public class ProgressPanel extends BackgroundPanel {
@@ -74,7 +71,6 @@ public class ProgressPanel extends BackgroundPanel {
         continueButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                StateManager.getInstance().setScreenState(GameState.PLAYING);
                 gameplayPanel.syncWithState(); // refresh BEFORE switching, not after
                 cardLayout.show(mainPanel, "GAMEPLAY");
             }
@@ -91,10 +87,9 @@ public class ProgressPanel extends BackgroundPanel {
 
                 ConfirmationOverlay overlay = new ConfirmationOverlay(
                     "/popups/withdrawConfirm.png",
-                    () -> { // TODO: implement GAMEOVER screen
-                        StateManager.getInstance().setScreenState(GameState.WITHDRAW);
-                        //TODO: check if reached checkpoint first before game over
-                        gameplayPanel.checkCheckpoint();
+                    () -> { 
+                        String screen = gameplayPanel.checkCheckpoint();
+                        gameplayPanel.showEnding(screen);
                     }
                 );
 
@@ -127,9 +122,9 @@ public class ProgressPanel extends BackgroundPanel {
 
         traceEliminationIcon.setUsed(state.isLifelineUsed(Lifeline.FIFTY_FIFTY));
         systemRerouteIcon.setUsed(state.isLifelineUsed(Lifeline.SWITCH_QUESTION));
-        specialLifelineIcon.setUsed(state.isLifelineUsed(host.getSpecialLifeline()));
-    
+
         if (host != null) {
+            specialLifelineIcon.setUsed(state.isLifelineUsed(host.getSpecialLifeline()));
             specialLifelineIcon.setActiveImage(
                 host.getSpecialLifeline().getActiveIconPath(),
                 host.getSpecialLifeline().getDisabledIconPath()

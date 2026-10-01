@@ -6,11 +6,14 @@ import java.util.Random;
 
 public enum Host {
     HOST_1("/images/host1.png", "/images/host1_gameplay.png", Lifeline.PARALLEL_PROCESSING,
-        buildHost1AnswerLines(), buildHost1StateLines(), buildHost1LifelineLines()),
+        buildHost1AnswerLines(), buildHost1StateLines(), buildHost1LifelineLines(), buildHost1NextQuestionLines(),
+        buildHost1PostFiftyLines(), buildHost1PostSeventyFiveLines()),
     HOST_2("/images/host2.png", "/images/host2_gameplay.png", Lifeline.NEURAL_PROMPT,
-        buildHost2AnswerLines(), buildHost2StateLines(), buildHost2LifelineLines()),
+        buildHost2AnswerLines(), buildHost2StateLines(), buildHost2LifelineLines(), buildHost2NextQuestionLines(),
+        buildHost2PostFiftyLines(), buildHost2PostSeventyFiveLines()),
     HOST_3("/images/host3.png", "/images/host3_gameplay.png", Lifeline.MEMORY_FLUSH,
-        buildHost3AnswerLines(), buildHost3StateLines(), buildHost3LifelineLines());
+        buildHost3AnswerLines(), buildHost3StateLines(), buildHost3LifelineLines(), buildHost3NextQuestionLines(),
+        buildHost3PostFiftyLines(), buildHost3PostSeventyFiveLines());
 
     private final String imagePath;
     private final String gameplayImagePath;
@@ -18,23 +21,50 @@ public enum Host {
     private final Map<AnswerState, String[]> answerLines;
     private final Map<GameState, String[]> stateLines;
     private final Map<Lifeline, String[]> lifelineLines;
+    private final String[] nextQuestionLines;
+    private final String[] postFiftyLines;
+    private final String[] postSeventyFiveLines;
     private static final Random random = new Random();
 
     Host(String imagePath, String gameplayImagePath, Lifeline specialLifeline,
          Map<AnswerState, String[]> answerLines, Map<GameState, String[]> stateLines,
-         Map<Lifeline, String[]> lifelineLines) {
+         Map<Lifeline, String[]> lifelineLines, String[] nextQuestionLines,
+         String[] postFiftyLines, String[] postSeventyFiveLines) {
         this.imagePath = imagePath;
         this.gameplayImagePath = gameplayImagePath;
         this.specialLifeline = specialLifeline;
         this.answerLines = answerLines;
         this.stateLines = stateLines;
         this.lifelineLines = lifelineLines;
+        this.nextQuestionLines = nextQuestionLines;
+        this.postFiftyLines = postFiftyLines;
+        this.postSeventyFiveLines = postSeventyFiveLines;
     }
+    
 
     // TODO: more lines for each state
     //TODO: on load of different questions
 
     // HOST 1
+
+    private static String[] buildHost1NextQuestionLines() {
+        return new String[]{
+            "Another calculation required."
+        };
+    }
+
+    private static String[] buildHost1PostFiftyLines() {
+        return new String[]{
+            "Halfway there. Do not grow careless now."
+        };
+    }
+
+    private static String[] buildHost1PostSeventyFiveLines() {
+        return new String[]{
+            "Close to completion. Maintain precision."
+        };
+    }
+
     private static Map<AnswerState, String[]> buildHost1AnswerLines() {
         Map<AnswerState, String[]> map = new EnumMap<>(AnswerState.class);
         map.put(AnswerState.CORRECT, new String[]{
@@ -50,7 +80,7 @@ public enum Host {
 
     private static Map<GameState, String[]> buildHost1StateLines() {
         Map<GameState, String[]> map = new EnumMap<>(GameState.class);
-        map.put(GameState.PLAYING, new String[]{
+        map.put(GameState.GAME_START, new String[]{
             "Systems online. Let's see if you survive."
         });
         map.put(GameState.FIFTY, new String[]{
@@ -83,6 +113,26 @@ public enum Host {
     }
 
     // HOST 2
+
+    private static String[] buildHost2NextQuestionLines() {
+        return new String[]{
+            "A new thought approaches.",
+            "Prepare your next response.",
+            "The link continues."
+        };
+    }
+    // HOST 2
+    private static String[] buildHost2PostFiftyLines() {
+        return new String[]{
+            "You have built half of the structure. Continue the link."
+        };
+    }
+
+    private static String[] buildHost2PostSeventyFiveLines() {
+        return new String[]{
+            "Nearly whole. Do not falter now."
+        };
+    }
     private static Map<AnswerState, String[]> buildHost2AnswerLines() {
         Map<AnswerState, String[]> map = new EnumMap<>(AnswerState.class);
         map.put(AnswerState.CORRECT, new String[]{
@@ -98,7 +148,7 @@ public enum Host {
 
     private static Map<GameState, String[]> buildHost2StateLines() {
         Map<GameState, String[]> map = new EnumMap<>(GameState.class);
-        map.put(GameState.PLAYING, new String[]{
+        map.put(GameState.GAME_START, new String[]{
             "Initializing neural link. Answer wisely."
         });
         map.put(GameState.FIFTY, new String[]{
@@ -131,6 +181,27 @@ public enum Host {
     }
 
     // HOST 3
+     private static String[] buildHost3NextQuestionLines() {
+        return new String[]{
+            "Another fragment awaits.",
+            "Continue the archive."
+        };
+    }
+
+    private static String[] buildHost3PostFiftyLines() {
+        return new String[]{
+            "Fifty percent archived. Half your data now persists.",
+            "Halfway through the memory banks."
+        };
+    }
+
+    private static String[] buildHost3PostSeventyFiveLines() {
+        return new String[]{
+            "Seventy-five percent stored. Nearly a complete record.",
+            "Three-quarters of your memory preserved."
+        };
+    }
+
     private static Map<AnswerState, String[]> buildHost3AnswerLines() {
         Map<AnswerState, String[]> map = new EnumMap<>(AnswerState.class);
         map.put(AnswerState.CORRECT, new String[]{
@@ -146,7 +217,7 @@ public enum Host {
 
     private static Map<GameState, String[]> buildHost3StateLines() {
         Map<GameState, String[]> map = new EnumMap<>(GameState.class);
-        map.put(GameState.PLAYING, new String[]{
+        map.put(GameState.GAME_START, new String[]{
             "Memory banks primed. Begin!"
         });
         map.put(GameState.FIFTY, new String[]{
@@ -199,4 +270,19 @@ public enum Host {
         if (lines == null || lines.length == 0) return "";
         return lines[random.nextInt(lines.length)];
     }
+    public String getNextQuestionLine() {
+        if (nextQuestionLines == null || nextQuestionLines.length == 0) return "";
+        return nextQuestionLines[random.nextInt(nextQuestionLines.length)];
+    }
+    public String getPostFiftyLine() {
+        if (postFiftyLines == null || postFiftyLines.length == 0) return "";
+        return postFiftyLines[random.nextInt(postFiftyLines.length)];
+    }
+
+    public String getPostSeventyFiveLine() {
+        if (postSeventyFiveLines == null || postSeventyFiveLines.length == 0) return "";
+        return postSeventyFiveLines[random.nextInt(postSeventyFiveLines.length)];
+    }
+
 }
+    

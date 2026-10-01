@@ -112,12 +112,20 @@ public class GameplayPanel extends BackgroundPanel {
         if(state.isLifelineUsedState() != null){
             return;
         }
+
+        int currentQuestionIndex = state.getCurrentQuestionNumber();
         if (host != null) {
             //TODO: do more if statements for each question
             //this is also for system reroute so it doesnt get overwritten by loadCurrentQuestion
             //will eventually differentiate playing and game start, just need to make dialogue for both
-            if(state.getScreenState().equals(GameState.PLAYING)){
-                dialogue.type(host.getLine(state.getScreenState()));
+            if(currentQuestionIndex == 1){
+                dialogue.type(host.getLine(GameState.GAME_START));
+            }else if(currentQuestionIndex == 8){
+                dialogue.type(host.getPostFiftyLine());
+            }else if(currentQuestionIndex == 11){
+                dialogue.type(host.getPostSeventyFiveLine());
+            }else{
+                dialogue.type(host.getNextQuestionLine());
             }
             
         }
@@ -180,12 +188,12 @@ public class GameplayPanel extends BackgroundPanel {
             showParallelProcessingConfirmation(lifeline, button);
             return; // marking used + applying effect happens inside the OK callback
         }
-
+        
         Host host = StateManager.getInstance().getCurrentHost();
-        if (host != null) {
+        if (host != null && lifeline != Lifeline.NEURAL_PROMPT) {
             dialogue.type(host.getLine(lifeline));
         }
-
+        StateManager.getInstance().useLifeline(lifeline);
         switch (lifeline) {
             case FIFTY_FIFTY -> applyFiftyFifty();
             case SWITCH_QUESTION -> applySwitchQuestion();
@@ -195,7 +203,7 @@ public class GameplayPanel extends BackgroundPanel {
         }
 
         button.setUsed(true);
-        StateManager.getInstance().useLifeline(lifeline);
+        
 
         //after using lifeline, reset lifeline sate
         StateManager.getInstance().resetLifelineUsedState();
@@ -288,6 +296,9 @@ public class GameplayPanel extends BackgroundPanel {
                 applyParallelProcessing();
                 button.setUsed(true);
                 StateManager.getInstance().useLifeline(lifeline);
+                if(StateManager.getInstance().getCurrentHost() != null){
+                    dialogue.type(StateManager.getInstance().getCurrentHost().getLine(lifeline));
+                }
             }
         );
 
@@ -360,7 +371,8 @@ public class GameplayPanel extends BackgroundPanel {
 
         } else {
             StateManager.getInstance().setLastAnswer(AnswerState.WRONG);
-            checkCheckpoint();
+            String screen = checkCheckpoint();
+            showEnding(screen);
         }
     }
 
@@ -385,29 +397,31 @@ public class GameplayPanel extends BackgroundPanel {
         }
     }
 
-    public void checkCheckpoint(){
+    public String checkCheckpoint(){
         StateManager state = StateManager.getInstance();
         int progressIndex = state.getCurrentQuestionNumber() - 1;
-        Host host = StateManager.getInstance().getCurrentHost();
 
         if (progressIndex < 8) {
             state.setScreenState(GameState.GAME_OVER);
-            dialogue.type(host.getLine(StateManager.getInstance().getScreenState()));
-            runAfterDelay(3000, () -> cardLayout.show(mainPanel, "GAME_OVER"));
-
+            return "GAME_OVER";
         } else if (progressIndex >= 8 && progressIndex < 11) {
             state.setScreenState(GameState.FIFTY);
-            dialogue.type(host.getLine(StateManager.getInstance().getScreenState()));
-            runAfterDelay(3000, () -> cardLayout.show(mainPanel, "CHECKPOINT_1"));
-
+            return "CHECKPOINT_1";
         } else if (progressIndex >= 11 && progressIndex < 15) {
             state.setScreenState(GameState.SEVENTY_FIVE);
-            dialogue.type(host.getLine(StateManager.getInstance().getScreenState()));
-            runAfterDelay(3000, () -> cardLayout.show(mainPanel, "CHECKPOINT_2"));
-
+            return "CHECKPOINT_2";
         } else {
             System.out.println("CHECKPOINT ERROR: something has gone wrong idk, debug idiot");
         }
+        return null;
+    }
+
+    public void showEnding(String screen){
+        Host host = StateManager.getInstance().getCurrentHost();
+        if(host != null){
+            dialogue.type(host.getLine(StateManager.getInstance().getScreenState()));
+        }
+        runAfterDelay(3000, () -> cardLayout.show(mainPanel, screen));
     }
 
     public void loadQuestionList(){
