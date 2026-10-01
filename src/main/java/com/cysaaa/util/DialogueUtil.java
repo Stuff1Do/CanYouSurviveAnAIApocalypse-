@@ -49,33 +49,32 @@ public class DialogueUtil {
         }
 
         currentFullText = fullText;
+        String wrappedFullText = applyWordWrap(fullText); // compute line breaks only on completed text
         int[] charIndex = {0};
 
         typewriterTimer = new Timer(millisPerChar, e -> {
             charIndex[0]++;
-            String visiblePortion = fullText.substring(0, Math.min(charIndex[0], fullText.length()));
-            targetLabel.setText(wrapHtml(visiblePortion));
+            // reveal characters from the WRAPPED text, not the raw text,
+            // so <br> tags are already in fixed positions and won't shift
+            String visiblePortion = wrappedFullText.substring(0, Math.min(charIndex[0], wrappedFullText.length()));
+            targetLabel.setText(wrapInHtmlTag(visiblePortion));
 
-            if (charIndex[0] >= fullText.length()) {
+            if (charIndex[0] >= wrappedFullText.length()) {
                 typewriterTimer.stop();
             }
         });
         typewriterTimer.start();
     }
 
-    
     public void skipToEnd() {
         if (typewriterTimer != null && typewriterTimer.isRunning()) {
             typewriterTimer.stop();
-            targetLabel.setText(wrapHtml(currentFullText));
+            targetLabel.setText(wrapInHtmlTag(applyWordWrap(currentFullText)));
         }
     }
 
-    public boolean isTyping() {
-        return typewriterTimer != null && typewriterTimer.isRunning();
-    }
-
-    private String wrapHtml(String text) {
+    // Inserts <br> every N words into the raw text
+    private String applyWordWrap(String text) {
         int wordsPerLine = 7;
         String[] words = text.split(" ");
         StringBuilder wrapped = new StringBuilder();
@@ -84,13 +83,18 @@ public class DialogueUtil {
             wrapped.append(words[i]);
             if ((i + 1) % wordsPerLine == 0 && i != words.length - 1) {
                 wrapped.append("<br>");
-            } else {
+            } else if (i != words.length - 1) {
                 wrapped.append(" ");
             }
         }
+        return wrapped.toString();
+    }
 
-        return "<html><div style='width: " + wrapWidth + "px; padding: 10px; text-align: left;'>"
-            + wrapped.toString().trim()
+    // Just wraps already-formatted text in the html/div container 
+    private String wrapInHtmlTag(String alreadyWrappedText) {
+        return "<html><div style='width: " + wrapWidth + "px; padding: 10px; text-align: left; "
+            + "word-wrap: break-word; overflow-wrap: break-word;'>"
+            + alreadyWrappedText
             + "</div></html>";
     }
 }
