@@ -9,6 +9,7 @@ import java.awt.image.RescaleOp;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.net.URL;
+import com.cysaaa.util.AudioManager;
 
 public class ImagePanel extends JPanel {
 
@@ -52,6 +53,11 @@ public class ImagePanel extends JPanel {
         setOpaque(false); // transparent parts of the PNG show what's behind it
 
         addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                AudioManager.playEffect("click.wav");
+            }
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 hovering = true;

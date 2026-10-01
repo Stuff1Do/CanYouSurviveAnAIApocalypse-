@@ -12,6 +12,9 @@ import com.cysaaa.util.GameState;
 import com.cysaaa.gui.screens.ProgressPanel;
 import com.cysaaa.gui.components.*;
 import com.cysaaa.util.StateManager;
+import com.cysaaa.util.AudioManager;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 
 public class HostSelectionPanel extends BackgroundPanel {
@@ -24,6 +27,12 @@ public class HostSelectionPanel extends BackgroundPanel {
         layout.setDesignSize(1920, 1080);
         setLayout(layout);
         setOpaque(false);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent event) {
+                AudioManager.playBackground("mainbg.wav");
+            }
+        });
 
         ImagePanel host1 = new ImagePanel("/buttons/host1.png", "/buttons/host1Hover.png");
         layout.addPixel(this, host1, 81, 340, 728, 612);

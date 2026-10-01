@@ -4,6 +4,7 @@ import com.cysaaa.gui.components.BackgroundPanel;
 import com.cysaaa.gui.components.PercentLayout;
 import com.cysaaa.gui.components.ImagePanel;
 import com.cysaaa.util.StateManager;
+import com.cysaaa.util.AudioManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +29,12 @@ public class GameOverPanel extends BackgroundPanel {
         percentLayout = new PercentLayout();
         percentLayout.setDesignSize(1920, 1080);
         setLayout(percentLayout);
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent event) {
+                AudioManager.playBackground("gameoverbg.wav");
+            }
+        });
 
         // Play Again -> reset state, back to host selection
         playAgainButton = new ImagePanel("/endings/playagain3.png", "playagain3_hover.png");

@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import com.cysaaa.terminal.TApp;
 import com.cysaaa.util.QuestionLoader;
+import com.cysaaa.util.AudioManager;
 import com.cysaaa.gui.screens.*;
 
 public class App {

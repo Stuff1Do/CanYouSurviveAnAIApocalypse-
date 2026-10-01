@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 import com.cysaaa.util.Host;
 import com.cysaaa.gui.components.*;
+import com.cysaaa.util.AudioManager;
 
 public class ConfirmationOverlay extends JPanel {
 
@@ -52,6 +53,7 @@ public class ConfirmationOverlay extends JPanel {
         noHitbox.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                AudioManager.playEffect("click.wav");
                 close();
             }
         });
@@ -62,6 +64,7 @@ public class ConfirmationOverlay extends JPanel {
         yesHitbox.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                AudioManager.playEffect("click.wav");
                 onYes.onConfirm();
                 close();
             }
@@ -93,6 +96,7 @@ public class ConfirmationOverlay extends JPanel {
         okHitbox.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                AudioManager.playEffect("click.wav");
                 onOk.onConfirm();
                 close();
             }

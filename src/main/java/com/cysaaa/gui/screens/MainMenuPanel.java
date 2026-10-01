@@ -6,6 +6,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 import com.cysaaa.gui.components.*;
 import com.cysaaa.util.StateManager;
+import com.cysaaa.util.AudioManager;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 
 public class MainMenuPanel extends BackgroundPanel {
@@ -17,6 +20,12 @@ public class MainMenuPanel extends BackgroundPanel {
         layout.setDesignSize(1920, 1080);
         setLayout(layout);
         setOpaque(false);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent event) {
+                AudioManager.playBackground("mainbg.wav");
+            }
+        });
 
         ImagePanel playButton = new ImagePanel("/buttons/start_button.png", "/buttons/startHover.png");
         layout.addPixel(this, playButton, 185, 460, 565, 175);

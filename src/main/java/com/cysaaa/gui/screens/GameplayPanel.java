@@ -76,7 +76,7 @@ public class GameplayPanel extends BackgroundPanel {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                
+                AudioManager.playBackground("questionbg.wav");
                 syncWithState();
                 loadCurrentQuestion();
             }
@@ -193,6 +193,7 @@ public class GameplayPanel extends BackgroundPanel {
         if (host != null && lifeline != Lifeline.NEURAL_PROMPT) {
             dialogue.type(host.getLine(lifeline));
         }
+        AudioManager.playEffect("lifeline.wav");
         StateManager.getInstance().useLifeline(lifeline);
         switch (lifeline) {
             case FIFTY_FIFTY -> applyFiftyFifty();
@@ -350,6 +351,7 @@ public class GameplayPanel extends BackgroundPanel {
 
     private void resolveAnswer(boolean correct) {
         if (correct) {
+            AudioManager.playEffect("correct.wav");
             StateManager.getInstance().setLastAnswer(AnswerState.CORRECT);
             StateManager.getInstance().nextQuestion();
 
@@ -370,6 +372,7 @@ public class GameplayPanel extends BackgroundPanel {
             }
 
         } else {
+            AudioManager.playEffect("wrong.wav");
             StateManager.getInstance().setLastAnswer(AnswerState.WRONG);
             String screen = checkCheckpoint();
             showEnding(screen);

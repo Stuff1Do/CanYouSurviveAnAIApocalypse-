@@ -10,6 +10,7 @@ import com.cysaaa.util.Host;
 import com.cysaaa.util.Lifeline;
 import com.cysaaa.util.Question;
 import com.cysaaa.util.QuestionLoader; 
+import com.cysaaa.util.AudioManager;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -135,6 +136,8 @@ public class TApp {
             boolean successful = useLifeline(question, currentQuestionIndex);
             if(!successful){
                     System.out.println("WARNING: Lifeline already used OR Invalid Input!");
+            } else {
+                AudioManager.playEffect("lifeline.wav");
             }
             
             askQuestion(randomizedQuestions);
@@ -154,11 +157,13 @@ public class TApp {
         }
 
         if (correct) {
+            AudioManager.playEffect("correct.wav");
             StateManager.getInstance().setLastAnswer(AnswerState.CORRECT);
             System.out.println("Correct Answer!");
             System.out.println();
             //DialogueManager.getInstance().trigger(DialogueEvent.CORRECT_ANSWER);
         } else {
+            AudioManager.playEffect("wrong.wav");
             StateManager.getInstance().setLastAnswer(AnswerState.WRONG);
             System.out.println("Wrong answer.");
             StateManager.getInstance().setScreenState(GameState.GAME_OVER);
