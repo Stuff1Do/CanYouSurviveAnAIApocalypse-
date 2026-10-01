@@ -238,6 +238,7 @@ public class GameplayPanel extends BackgroundPanel {
     }
 
     private void replaceCurrentQuestion(Predicate<Question> matcher) {
+        
         List<Question> candidates = new ArrayList<>();
         for (Question q : questionList) {
             if (!sortedRandomizedQuestions.contains(q) && matcher.test(q)) {
@@ -252,7 +253,12 @@ public class GameplayPanel extends BackgroundPanel {
 
         int idx = StateManager.getInstance().getCurrentQuestionNumber() - 1;
         sortedRandomizedQuestions.set(idx, replacement);
+        
         loadCurrentQuestion(); // will also reset eliminated/parallel state, which is correct here
+
+        if(StateManager.getInstance().isLifelineUsed(Lifeline.FIFTY_FIFTY)){
+            applyFiftyFifty();
+        }
     }
 
     private int getTier(String type) {

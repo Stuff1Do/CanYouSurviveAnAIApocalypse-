@@ -74,6 +74,7 @@ public class ProgressPanel extends BackgroundPanel {
         continueButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                StateManager.getInstance().setScreenState(GameState.PLAYING);
                 gameplayPanel.syncWithState(); // refresh BEFORE switching, not after
                 cardLayout.show(mainPanel, "GAMEPLAY");
             }
