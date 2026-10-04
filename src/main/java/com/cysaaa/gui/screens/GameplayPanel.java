@@ -29,8 +29,7 @@ public class GameplayPanel extends BackgroundPanel {
     private JLabel typeLabel;
 
     // Question box
-    private JLabel questionTextLabel;
-    private JLabel choicesLabel;
+    private JLabel questionTextLabel; // shows question + choices
 
     // Host speech bubble
     private JLabel dialogueLabel;
@@ -41,6 +40,21 @@ public class GameplayPanel extends BackgroundPanel {
 
     // Answer buttons
     private ImagePanel answerA, answerB, answerC, answerD;
+
+    // Answer button image paths, indexed A-D (0-3)
+    // TODO: drop the correct/wrong assets into /buttons/ (filenames below are placeholders)
+    private static final String[] ANSWER_IMAGE_PATHS = {
+        "/buttons/answer_a.png", "/buttons/answer_b.png", "/buttons/answer_c.png", "/buttons/answer_d.png"
+    };
+    private static final String[] ANSWER_HOVER_IMAGE_PATHS = {
+        "/buttons/answer_a_hover.png", "/buttons/answer_b_hover.png", "/buttons/answer_c_hover.png", "/buttons/answer_d_hover.png"
+    };
+    private static final String[] ANSWER_CORRECT_IMAGE_PATHS = {
+        "/buttons/answer_a_correct.png", "/buttons/answer_b_correct.png", "/buttons/answer_c_correct.png", "/buttons/answer_d_correct.png"
+    };
+    private static final String[] ANSWER_WRONG_IMAGE_PATHS = {
+        "/buttons/answer_a_wrong.png", "/buttons/answer_b_wrong.png", "/buttons/answer_c_wrong.png", "/buttons/answer_d_wrong.png"
+    };
 
     // Lifeline buttons
     private LifelineIconPanel traceEliminationButton; // 50:50
@@ -72,6 +86,7 @@ public class GameplayPanel extends BackgroundPanel {
         buildUIComponents(); // build everything once, then load questions later
 
         dialogue = new DialogueUtil(dialogueLabel, 30, 420, "/fonts/Exo2-SemiBold.ttf", 18f);
+        dialogue.enableAutoFit(24, 12); // max, min font size
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -79,6 +94,14 @@ public class GameplayPanel extends BackgroundPanel {
                 
                 syncWithState();
                 loadCurrentQuestion();
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                // reset while off-screen so the red/green result and old dialogue don't flash on return
+                resetAnswerButtonImages();
+                dialogue.clear();
+                questionTextLabel.setText(""); // new question is set in componentShown
             }
         });
 
@@ -142,6 +165,24 @@ public class GameplayPanel extends BackgroundPanel {
             btn.setVisible(true);
             btn.setSelected(false);
         }
+        resetAnswerButtonImages();
+    }
+
+    // Restores default look after a correct/wrong reveal
+    private void resetAnswerButtonImages() {
+        ImagePanel[] buttons = getAnswerButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].setImage(ANSWER_IMAGE_PATHS[i]);
+            buttons[i].setHoverImage(ANSWER_HOVER_IMAGE_PATHS[i]);
+        }
+    }
+
+    // Turns the clicked answer button green (correct) or red (wrong).
+    // Hover image is cleared so hovering doesn't hide the result.
+    private void showAnswerResult(int index, boolean correct) {
+        ImagePanel button = getAnswerButtons()[index];
+        button.setHoverImage(null);
+        button.setImage(correct ? ANSWER_CORRECT_IMAGE_PATHS[index] : ANSWER_WRONG_IMAGE_PATHS[index]);
     }
 
     private ImagePanel[] getAnswerButtons() {
@@ -334,10 +375,13 @@ public class GameplayPanel extends BackgroundPanel {
         boolean correct = parallelSelections.stream().anyMatch(question::isCorrect);
 
         parallelProcessingActive = false;
-        parallelSelections.clear();
         for (ImagePanel btn : getAnswerButtons()) {
             btn.setSelected(false); // clear highlights before moving to next question/screen
         }
+        for (int pick : parallelSelections) {
+            showAnswerResult(pick, question.isCorrect(pick));
+        }
+        parallelSelections.clear();
 
         resolveAnswer(correct);
     }
@@ -345,10 +389,12 @@ public class GameplayPanel extends BackgroundPanel {
     private void evaluateAnswer(int index) {
         Question question = getCurrentQuestion();
         boolean correct = question.isCorrect(index);
+        showAnswerResult(index, correct);
         resolveAnswer(correct);
     }
 
     private void resolveAnswer(boolean correct) {
+        answerLock = true; // block further answer/lifeline clicks for every outcome
         if (correct) {
             StateManager.getInstance().setLastAnswer(AnswerState.CORRECT);
             StateManager.getInstance().nextQuestion();
@@ -356,13 +402,11 @@ public class GameplayPanel extends BackgroundPanel {
             if (StateManager.getInstance().getCurrentQuestionNumber() > sortedRandomizedQuestions.size()) {
                 StateManager.getInstance().setScreenState(GameState.VICTORY);
                 dialogue.type(StateManager.getInstance().getCurrentHost().getLine(StateManager.getInstance().getScreenState()));
-                answerLock = true;
                 runAfterDelay(3000, () -> {
                     cardLayout.show(mainPanel, "VICTORY");
                 });
             } else {
                 dialogue.type(StateManager.getInstance().getCurrentHost().getLine(StateManager.getInstance().getLastAnswer()));
-                answerLock = true;
                 runAfterDelay(3000, () -> {
                     progressPanel.syncWithState();
                     cardLayout.show(mainPanel, "PROGRESS");
@@ -447,15 +491,27 @@ public class GameplayPanel extends BackgroundPanel {
     // hostDialogue param removed — dialogue is now set separately via dialogue.type()
     public void setQuestion(String type, String questionText, String[] choices) {
         typeLabel.setText("TYPE: " + type.toUpperCase());
-        questionTextLabel.setText("<html>" + questionText + "</html>");
-
+        // question + choices in one label so the choices always sit right under the question
         StringBuilder sb = new StringBuilder("<html>");
+        sb.append(questionText);
+        sb.append("<div style='margin-top: 20px'>"); // gap between question and choices
         String[] letters = {"A", "B", "C", "D"};
         for (int i = 0; i < choices.length; i++) {
             sb.append(letters[i]).append(". ").append(choices[i]).append("<br>");
         }
-        sb.append("</html>");
-        choicesLabel.setText(sb.toString());
+        sb.append("</div></html>");
+        questionTextLabel.setText(sb.toString());
+        fitQuestionFont();
+    }
+
+    // Font size range for the question box — text uses the largest size that still fits
+    private static final int QUESTION_MAX_FONT = 28;
+    private static final int QUESTION_MIN_FONT = 12;
+
+    // Shrinks the question label's font from MAX down until the wrapped HTML fits the label height.
+    // (if not laid out yet, componentResized will call this again)
+    private void fitQuestionFont() {
+        LabelFontFitter.fitToHeight(questionTextLabel, QUESTION_MAX_FONT, QUESTION_MIN_FONT);
     }
 
     private void runAfterDelay(int delayMillis, Runnable action) {
@@ -473,20 +529,24 @@ public class GameplayPanel extends BackgroundPanel {
         questionTextLabel = new JLabel();
         questionTextLabel.setForeground(Color.WHITE);
         questionTextLabel.setFont(new Font("SansSerif", Font.ITALIC, 16));
-        questionTextLabel.setVerticalAlignment(SwingConstants.TOP);
-        percentLayout.addPixel(this, questionTextLabel, 213, 273, 976, 150);
-
-        choicesLabel = new JLabel();
-        choicesLabel.setForeground(Color.WHITE);
-        choicesLabel.setFont(new Font("SansSerif", Font.ITALIC, 16));
-        choicesLabel.setVerticalAlignment(SwingConstants.TOP);
-        percentLayout.addPixel(this, choicesLabel, 213, 450, 976, 160);
+        questionTextLabel.setVerticalAlignment(SwingConstants.CENTER); // block sits in the vertical middle of the box
+        questionTextLabel.setHorizontalAlignment(SwingConstants.LEFT); // lines stay left-aligned
+        percentLayout.addPixel(this, questionTextLabel, 213, 297, 946, 432);
+        // label size changes with the window, so refit the font whenever it's resized
+        questionTextLabel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                fitQuestionFont();
+            }
+        });
 
         // font + typewriter now handled by DialogueUtil, constructed after this method returns
         dialogueLabel = new JLabel();
         dialogueLabel.setForeground(Color.WHITE);
-        dialogueLabel.setVerticalAlignment(SwingConstants.TOP);
-        percentLayout.addPixel(this, dialogueLabel, 1332, 119, 495, 237);
+        dialogueLabel.setVerticalAlignment(SwingConstants.CENTER);
+        dialogueLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // position/size in 1920x1080 design pixels: x, y, width, height
+        percentLayout.addPixel(this, dialogueLabel, 1312, 88, 513, 176);
 
         dialogueLabel.addMouseListener(new MouseAdapter() {
             @Override
