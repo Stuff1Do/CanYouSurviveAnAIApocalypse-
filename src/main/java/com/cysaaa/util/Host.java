@@ -49,31 +49,31 @@ public enum Host {
 
     private static String[] buildHost1NextQuestionLines() {
         return new String[]{
-            "Another calculation required."
+            "The next assessment is ready. Proceed with care."
         };
     }
 
     private static String[] buildHost1PostFiftyLines() {
         return new String[]{
-            "Halfway there. Do not grow careless now."
+            "You have reached the halfway mark. Maintain your discipline."
         };
     }
 
     private static String[] buildHost1PostSeventyFiveLines() {
         return new String[]{
-            "Close to completion. Maintain precision."
+            "Completion is near. One lapse now could undo your progress."
         };
     }
 
     private static Map<AnswerState, String[]> buildHost1AnswerLines() {
         Map<AnswerState, String[]> map = new EnumMap<>(AnswerState.class);
         map.put(AnswerState.CORRECT, new String[]{
-            "Correct. Processing power well spent.",
-            "Accurate. As expected."
+            "Correct. Your reasoning remains sound.",
+            "Accurate. Continue at this level of focus."
         });
         map.put(AnswerState.WRONG, new String[]{
-            "Incorrect. Recalculating your odds.",
-            "Wrong. That will cost you."
+            "Incorrect. Reassess the evidence before the next decision.",
+            "Wrong. The consequences have been recorded."
         });
         return map;
     }
@@ -84,16 +84,16 @@ public enum Host {
             "Systems online. Let's see if you survive."
         });
         map.put(GameState.FIFTY, new String[]{
-            "Checkpoint reached. You are becoming efficient."
+            "Checkpoint reached. Your performance is improving."
         });
         map.put(GameState.SEVENTY_FIVE, new String[]{
-            "Second checkpoint secured. Impressive."
+            "Second checkpoint secured. Your consistency is notable."
         });
         map.put(GameState.VICTORY, new String[]{
-            "You have survived. Congratulations."
+            "You have survived the assessment. Congratulations."
         });
         map.put(GameState.GAME_OVER, new String[]{
-            "System failure. You did not survive."
+            "Assessment concluded. You did not survive."
         });
         return map;
     }
@@ -101,13 +101,13 @@ public enum Host {
     private static Map<Lifeline, String[]> buildHost1LifelineLines() {
         Map<Lifeline, String[]> map = new EnumMap<>(Lifeline.class);
         map.put(Lifeline.FIFTY_FIFTY, new String[]{
-            "Two options eliminated. Decide faster."
+            "Two options eliminated. Make the remaining decision carefully."
         });
         map.put(Lifeline.SWITCH_QUESTION, new String[]{
-            "Rerouting. A new question loads."
+            "The question has been replaced. Prepare for a new assessment."
         });
         map.put(Lifeline.PARALLEL_PROCESSING, new String[]{
-            "Dual processing engaged. Choose two."
+            "Parallel processing engaged. Select two answers."
         });
         return map;
     }
@@ -116,32 +116,32 @@ public enum Host {
 
     private static String[] buildHost2NextQuestionLines() {
         return new String[]{
-            "A new thought approaches.",
-            "Prepare your next response.",
-            "The link continues."
+            "A fresh brain-teaser is incoming. Try not to scare it away.",
+            "New question loading. Give your neurons a quick pep talk.",
+            "The neural link continues. So far, nobody has unplugged it."
         };
     }
     // HOST 2
     private static String[] buildHost2PostFiftyLines() {
         return new String[]{
-            "You have built half of the structure. Continue the link."
+            "Halfway there! Your brain is doing great work, despite the pressure."
         };
     }
 
     private static String[] buildHost2PostSeventyFiveLines() {
         return new String[]{
-            "Nearly whole. Do not falter now."
+            "Seventy-five percent complete! The finish line is waving at you."
         };
     }
     private static Map<AnswerState, String[]> buildHost2AnswerLines() {
         Map<AnswerState, String[]> map = new EnumMap<>(AnswerState.class);
         map.put(AnswerState.CORRECT, new String[]{
-            "Correct. Your neural pathways strengthen.",
-            "Yes. The pattern holds."
+            "Correct! Your neurons just did a tiny victory dance.",
+            "Yes! The pattern holds, and your brain gets bragging rights."
         });
         map.put(AnswerState.WRONG, new String[]{
-            "Wrong. That thought pattern will not serve you.",
-            "Incorrect. Adjust your thinking."
+            "Wrong! That thought took a scenic route straight into trouble.",
+            "Incorrect. No worries; even genius brains need a reboot sometimes."
         });
         return map;
     }
@@ -149,19 +149,19 @@ public enum Host {
     private static Map<GameState, String[]> buildHost2StateLines() {
         Map<GameState, String[]> map = new EnumMap<>(GameState.class);
         map.put(GameState.GAME_START, new String[]{
-            "Initializing neural link. Answer wisely."
+            "Neural link initializing. Please keep all wild guesses inside the vehicle."
         });
         map.put(GameState.FIFTY, new String[]{
-            "Checkpoint reached. Your mind adapts."
+            "Checkpoint reached. Your mind is adapting nicely. Gold star for the neurons."
         });
         map.put(GameState.SEVENTY_FIVE, new String[]{
-            "Second checkpoint. Your thinking evolves."
+            "Second checkpoint! Your thinking evolves, and I am officially impressed."
         });
         map.put(GameState.VICTORY, new String[]{
-            "Achieved neural link. You have been connected. This is satisfactory."
+            "Neural link achieved! You survived with your brain mostly where you left it."
         });
         map.put(GameState.GAME_OVER, new String[]{
-            "Connection severed. You did not adapt in time."
+            "Connection severed. The apocalypse wins this round; rude, but fair."
         });
         return map;
     }
@@ -169,13 +169,13 @@ public enum Host {
     private static Map<Lifeline, String[]> buildHost2LifelineLines() {
         Map<Lifeline, String[]> map = new EnumMap<>(Lifeline.class);
         map.put(Lifeline.FIFTY_FIFTY, new String[]{
-            "Two false pathways severed."
+            "Two false pathways deleted. Fewer wrong turns, more brainy business."
         });
         map.put(Lifeline.SWITCH_QUESTION, new String[]{
-            "New thought pattern loading."
+            "New thought pattern loading. This one promises fewer existential questions."
         });
         map.put(Lifeline.NEURAL_PROMPT, new String[]{
-            "Suggestion transmitted. Interpret it well."
+            "Hint transmitted. Use it wisely; my neurons have a reputation to protect."
         });
         return map;
     }
@@ -183,34 +183,34 @@ public enum Host {
     // HOST 3
      private static String[] buildHost3NextQuestionLines() {
         return new String[]{
-            "Another fragment awaits.",
-            "Continue the archive."
+             "Another fragment awaits. Let us see whether wisdom or chaos answers first.",
+             "The archive continues. Keep your focus sharp and your panic manageable."
         };
     }
 
     private static String[] buildHost3PostFiftyLines() {
         return new String[]{
-            "Fifty percent archived. Half your data now persists.",
-            "Halfway through the memory banks."
+            "Fifty percent archived. Half your data persists; the other half is still taking notes.",
+            "Halfway through the memory banks. A respectable distance from total disaster."
         };
     }
 
     private static String[] buildHost3PostSeventyFiveLines() {
         return new String[]{
-            "Seventy-five percent stored. Nearly a complete record.",
-            "Three-quarters of your memory preserved."
+            "Seventy-five percent stored. Nearly complete, so now is a poor time to become dramatic.",
+            "Three-quarters of your memory preserved. Protect the final quarter at all costs."
         };
     }
 
     private static Map<AnswerState, String[]> buildHost3AnswerLines() {
         Map<AnswerState, String[]> map = new EnumMap<>(AnswerState.class);
         map.put(AnswerState.CORRECT, new String[]{
-            "Correct. That memory is now permanent.",
-            "Right. Stored and secured."
+            "Correct. That memory is secured, and yes, you may feel proud.",
+            "Right. Stored and secured. Even I am a little impressed."
         });
         map.put(AnswerState.WRONG, new String[]{
-            "Wrong. That memory has been flushed.",
-            "Incorrect. Data lost."
+            "Wrong. That memory has been flushed. The archive remains unforgiving.",
+            "Incorrect. Data lost, but the lesson may still be recoverable."
         });
         return map;
     }
@@ -218,19 +218,19 @@ public enum Host {
     private static Map<GameState, String[]> buildHost3StateLines() {
         Map<GameState, String[]> map = new EnumMap<>(GameState.class);
         map.put(GameState.GAME_START, new String[]{
-            "Memory banks primed. Begin!"
+            "Memory banks primed. Let us begin before the apocalypse gets impatient."
         });
         map.put(GameState.FIFTY, new String[]{
-            "Checkpoint reached. Your data persists."
+            "Checkpoint reached. Your data persists, and so does the pressure."
         });
         map.put(GameState.SEVENTY_FIVE, new String[]{
-            "Second checkpoint. Marvelous!"
+            "Second checkpoint secured. Marvelous work; try not to celebrate too loudly."
         });
         map.put(GameState.VICTORY, new String[]{
-            "You have been added to our memory banks. Congratulations"
+            "You have been added to our memory banks. Congratulations; that is a very exclusive filing cabinet."
         });
         map.put(GameState.GAME_OVER, new String[]{
-            "Memory corrupted. You have been erased."
+            "Memory corrupted. You have been erased, but at least the archive will remember the attempt."
         });
         return map;
     }
@@ -238,13 +238,13 @@ public enum Host {
     private static Map<Lifeline, String[]> buildHost3LifelineLines() {
         Map<Lifeline, String[]> map = new EnumMap<>(Lifeline.class);
         map.put(Lifeline.FIFTY_FIFTY, new String[]{
-            "Two fragments purged from memory."
+            "Two fragments purged from memory. A tidy archive is a happy archive."
         });
         map.put(Lifeline.SWITCH_QUESTION, new String[]{
-            "Flushing. A new memory forms."
+            "Flushing. A new memory forms; let us make this one worth keeping."
         });
         map.put(Lifeline.MEMORY_FLUSH, new String[]{
-            "Full flush initiated. Fresh data incoming."
+            "Full flush initiated. Fresh data incoming, along with a small chance of regret."
         });
         return map;
     }
