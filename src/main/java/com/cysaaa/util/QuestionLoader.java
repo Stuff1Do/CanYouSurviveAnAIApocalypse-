@@ -41,7 +41,7 @@ public class QuestionLoader {
                 String[] fields = line.split("\t"); 
 
                 //if field has less than needed information, skip
-                if (fields.length < 7) {
+                if (fields.length < 8) {
                     System.out.println("Skipping error row: " + line);
                     continue;
                 }
