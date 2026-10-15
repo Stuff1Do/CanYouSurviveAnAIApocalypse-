@@ -20,7 +20,7 @@ import java.awt.event.ComponentEvent;
 public class HostSelectionPanel extends BackgroundPanel {
 
     public HostSelectionPanel(JPanel cardContainer, CardLayout cardLayout, ProgressPanel progressPanel) {
-        super("/backgrounds/hostSelection.png");
+        super("/backgrounds/HostSelection.png");
 
 
         PercentLayout layout = new PercentLayout();
@@ -34,7 +34,7 @@ public class HostSelectionPanel extends BackgroundPanel {
             }
         });
 
-        ImagePanel host1 = new ImagePanel("/buttons/host1.png", "/buttons/host1Hover.png");
+        ImagePanel host1 = new ImagePanel("/buttons/host1.png", "/buttons/host1hover.png");
         layout.addPixel(this, host1, 81, 340, 728, 612);
         host1.setPixelPreciseHitTest(true);
         host1.addMouseListener(new MouseAdapter() {
@@ -44,7 +44,7 @@ public class HostSelectionPanel extends BackgroundPanel {
             }
         });
 
-        ImagePanel host2 = new ImagePanel("/buttons/host2.png", "/buttons/host2Hover.png");
+        ImagePanel host2 = new ImagePanel("/buttons/host2.png", "/buttons/host2hover.png");
         layout.addPixel(this, host2, 710, 320, 506, 729);
         host2.setPixelPreciseHitTest(true);
         host2.addMouseListener(new MouseAdapter() {
@@ -54,7 +54,7 @@ public class HostSelectionPanel extends BackgroundPanel {
             }
         });
 
-        ImagePanel host3 = new ImagePanel("/buttons/host3.png", "/buttons/host3Hover.png");
+        ImagePanel host3 = new ImagePanel("/buttons/host3.png", "/buttons/host3hover.png");
         layout.addPixel(this, host3, 1102, 329, 728, 612);
         host3.setPixelPreciseHitTest(true);
         host3.addMouseListener(new MouseAdapter() {
