@@ -12,10 +12,14 @@ public class LifelineIconPanel extends ImagePanel {
     }
 
     public LifelineIconPanel(String activeImagePath, String disabledImagePath, String hoverImagePath) {
-        super(activeImagePath);
+        super();    // no image yet
         this.activeImagePath = activeImagePath;
         this.disabledImagePath = disabledImagePath;
         this.hoverImagePath = hoverImagePath;
+
+        if (activeImagePath != null) {
+            setImage(activeImagePath);
+        }
         setHoverImage(hoverImagePath);
     }
 

@@ -1,4 +1,3 @@
-
 package com.cysaaa.gui.screens;
 
 import java.awt.AlphaComposite;
@@ -32,6 +31,9 @@ public class MainMenuPanel extends BackgroundPanel {
     // CONFIGURATION
     // ---------------------------------------------------------
 
+    private static final String BACKGROUND_IMAGE =
+            "/backgrounds/background_mainmenu.png";
+
     private static final String TITLE_IMAGE =
             "/splashscreen/splash2.png";
 
@@ -45,6 +47,7 @@ public class MainMenuPanel extends BackgroundPanel {
     private static final int TITLE_PANEL_WIDTH = 940;
     private static final int TITLE_PANEL_HEIGHT = 245;
 
+    private final CrowFlock crows;
     private static final Color[] SPARK_COLORS = {
         new Color(255, 40, 200),
         new Color(110, 220, 255),
@@ -56,9 +59,10 @@ public class MainMenuPanel extends BackgroundPanel {
     // ---------------------------------------------------------
 
     private final WindEffect wind = new WindEffect(70);
+
     private final CharacterAnimator characters;
+    private final AmbientEffects ambient;
     private final long animStart = System.currentTimeMillis();
-    
 
     private final Random random = new Random();
 
@@ -95,9 +99,14 @@ public class MainMenuPanel extends BackgroundPanel {
             CardLayout cardLayout,
             GameplayPanel gameplayPanel) {
 
-        super("/backgrounds/background_mainmenu.png");
-         
-        characters = new CharacterAnimator(loadBackground());
+        super(BACKGROUND_IMAGE);
+
+        // One shared copy of the background for the animators.
+        BufferedImage menuImage = loadBackground();
+        characters = new CharacterAnimator(menuImage);
+        ambient = new AmbientEffects(menuImage);
+        crows = new CrowFlock(characters);
+        
 
         PercentLayout layout = new PercentLayout();
         layout.setDesignSize(DESIGN_WIDTH, DESIGN_HEIGHT);
@@ -113,7 +122,7 @@ public class MainMenuPanel extends BackgroundPanel {
         // -----------------------------------------------------
 
         titlePanel = new TitleOverlayPanel();
-            
+
         layout.addPixel(
                 this,
                 titlePanel,
@@ -125,16 +134,14 @@ public class MainMenuPanel extends BackgroundPanel {
 
         nextFlickerAt = System.currentTimeMillis()
                 + randomBetween(1800, 3400);
-        
+
         // -----------------------------------------------------
-        // PLAY BUTTON -- ORIGINAL POSITION PRESERVED
+        // PLAY BUTTON
         // -----------------------------------------------------
 
         ImagePanel playButton = new ImagePanel(
                 "/buttons/start_button.png",
                 "/buttons/startHover.png");
-
-        layout.addPixel(this, playButton, 185, 460, 565, 175);
 
         playButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -145,14 +152,14 @@ public class MainMenuPanel extends BackgroundPanel {
         });
 
         // -----------------------------------------------------
-        // HOW TO PLAY BUTTON -- ORIGINAL POSITION PRESERVED
+        // HOW TO PLAY BUTTON
         // -----------------------------------------------------
 
         ImagePanel howToPlayButton = new ImagePanel(
                 "/buttons/how_to_play.png",
                 "/buttons/htpHover.png");
 
-        layout.addPixel(this, howToPlayButton, 241, 651, 447, 138);
+       
 
         howToPlayButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -162,21 +169,24 @@ public class MainMenuPanel extends BackgroundPanel {
         });
 
         // -----------------------------------------------------
-        // EXIT BUTTON -- ORIGINAL POSITION PRESERVED
+        // EXIT BUTTON
         // -----------------------------------------------------
 
         ImagePanel exitButton = new ImagePanel(
                 "/buttons/exit_button.png",
                 "/buttons/exitHover.png");
 
-        layout.addPixel(this, exitButton, 265, 800, 406, 126);
-
+        
         exitButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 System.exit(0);
             }
         });
+
+        layout.addPixel(this, playButton,      185, 460, 565, 175);
+        layout.addPixel(this, howToPlayButton, 241, 651, 447, 138);
+        layout.addPixel(this, exitButton,      265, 800, 406, 126);
 
         // -----------------------------------------------------
         // MENU LIFECYCLE
@@ -209,17 +219,33 @@ public class MainMenuPanel extends BackgroundPanel {
         });
     }
 
+    // Places a button so its RESTING size is (w, h) at (x, y), leaving room
+   
     // ---------------------------------------------------------
-    // LOAD AND CROP TITLE IMAGE
+    // LOAD BACKGROUND FOR THE ANIMATORS
     // ---------------------------------------------------------
+
     private static BufferedImage loadBackground() {
+
         try (InputStream in = MainMenuPanel.class
-                .getResourceAsStream("/backgrounds/background_mainmenu.png")) {
+                .getResourceAsStream(BACKGROUND_IMAGE)) {
+
+            if (in == null) {
+                throw new RuntimeException(
+                        "Menu background not found: " + BACKGROUND_IMAGE);
+            }
+
             return ImageIO.read(in);
+
         } catch (IOException e) {
             throw new RuntimeException("Cannot load menu background", e);
         }
     }
+
+    // ---------------------------------------------------------
+    // LOAD AND CROP TITLE IMAGE
+    // ---------------------------------------------------------
+
     private void loadTitleOverlay() {
 
         try (InputStream input =
@@ -288,7 +314,6 @@ public class MainMenuPanel extends BackgroundPanel {
 
         long now = System.currentTimeMillis();
 
-        // Update existing sparks and remove expired particles.
         Iterator<Spark> iterator = sparks.iterator();
 
         while (iterator.hasNext()) {
@@ -301,7 +326,6 @@ public class MainMenuPanel extends BackgroundPanel {
             }
         }
 
-        // Start an occasional flicker burst.
         if (!flickering && now >= nextFlickerAt) {
 
             flickering = true;
@@ -309,7 +333,6 @@ public class MainMenuPanel extends BackgroundPanel {
             flickerEndsAt = now + randomBetween(240, 460);
             nextFlickerToggleAt = now;
 
-            // Electrical discharge when the title glitches.
             spawnSparks(randomBetween(9, 16));
         }
 
@@ -317,7 +340,6 @@ public class MainMenuPanel extends BackgroundPanel {
             return;
         }
 
-        // Restore the title to full brightness after the burst.
         if (now >= flickerEndsAt) {
 
             flickering = false;
@@ -328,7 +350,6 @@ public class MainMenuPanel extends BackgroundPanel {
             return;
         }
 
-        // Irregular brightness changes simulate an unstable neon sign.
         if (now >= nextFlickerToggleAt) {
 
             boolean lit = random.nextFloat() > 0.42f;
@@ -363,8 +384,6 @@ public class MainMenuPanel extends BackgroundPanel {
             return;
         }
 
-        // Coordinates are relative to the title panel,
-        // not the entire 1920 x 1080 screen.
         int left = 20;
         int right = titlePanel.getWidth() - 20;
 
@@ -463,7 +482,6 @@ public class MainMenuPanel extends BackgroundPanel {
             float tailY = spark.y
                     - spark.vy / speed * spark.length;
 
-            // Soft colored outer glow.
             g.setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER,
                     alpha * 0.45f));
@@ -481,7 +499,6 @@ public class MainMenuPanel extends BackgroundPanel {
                     Math.round(spark.x),
                     Math.round(spark.y));
 
-            // Bright white electrical core.
             g.setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER,
                     alpha));
@@ -499,7 +516,6 @@ public class MainMenuPanel extends BackgroundPanel {
                     Math.round(spark.x),
                     Math.round(spark.y));
 
-            // Bright point at the spark tip.
             g.fillOval(
                     Math.round(spark.x - 2),
                     Math.round(spark.y - 2),
@@ -511,12 +527,13 @@ public class MainMenuPanel extends BackgroundPanel {
     }
 
     // ---------------------------------------------------------
-    // MAIN MENU BACKGROUND AND WIND
+    // MAIN MENU BACKGROUND, CHARACTERS, AMBIENT EFFECTS, WIND
     // ---------------------------------------------------------
 
-   @Override
+    @Override
     protected void paintComponent(Graphics g) {
 
+        // Draw background_mainmenu.png.
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g.create();
@@ -525,21 +542,34 @@ public class MainMenuPanel extends BackgroundPanel {
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Animated characters (scaled from image pixels to panel size)
+        // Characters + ambient effects, scaled from image pixels
+        // to the current panel size.
         Graphics2D cg = (Graphics2D) g2.create();
+
         cg.setRenderingHint(
                 RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
         cg.scale(getWidth() / (double) characters.getWidth(),
-                getHeight() / (double) characters.getHeight());
-        characters.paint(cg, (System.currentTimeMillis() - animStart) / 1000.0);
+                 getHeight() / (double) characters.getHeight());
+
+        double t = (System.currentTimeMillis() - animStart) / 1000.0;
+
+        characters.paint(cg, t);
+        ambient.paint(cg, t);
+        
+        characters.paint(cg, t);
+        ambient.paint(cg, t);
+        crows.paint(cg, t);
+        
         cg.dispose();
 
-        // Preserve the original wind effect.
+        // Original wind effect.
         wind.setSize(getWidth(), getHeight());
         wind.paint(g2);
 
         g2.dispose();
+
     }
 
     // ---------------------------------------------------------
@@ -575,7 +605,6 @@ public class MainMenuPanel extends BackgroundPanel {
                     RenderingHints.KEY_INTERPOLATION,
                     RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
-            // Draw the cropped title inside the PercentLayout panel.
             if (titleOverlay != null) {
 
                 g2.setComposite(AlphaComposite.getInstance(
@@ -596,7 +625,6 @@ public class MainMenuPanel extends BackgroundPanel {
                 g2.setComposite(AlphaComposite.SrcOver);
             }
 
-            // Sparks render within the title panel's coordinate system.
             paintSparks(g2);
 
             g2.dispose();
@@ -650,10 +678,7 @@ public class MainMenuPanel extends BackgroundPanel {
             x += vx;
             y += vy;
 
-            // Slight gravity gives sparks a natural arc.
             vy += 0.08f;
-
-            // Gradually reduce horizontal velocity.
             vx *= 0.985f;
 
             life -= 33;

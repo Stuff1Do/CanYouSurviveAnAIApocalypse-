@@ -594,7 +594,7 @@ public class GameplayPanel extends BackgroundPanel {
         percentLayout.addPixel(this, systemRerouteButton, 1303, 957, 539, 64);
         wireLifeline(systemRerouteButton, Lifeline.SWITCH_QUESTION);
 
-        specialLifelineButton = new LifelineIconPanel("/buttons/placeholder.png", "/buttons/placeholder.png");
+        specialLifelineButton = new LifelineIconPanel(null, null);
         percentLayout.addPixel(this, specialLifelineButton, 1303, 790, 539, 64);
         wireLifeline(specialLifelineButton, null);
     }

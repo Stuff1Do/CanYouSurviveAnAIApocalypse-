@@ -37,7 +37,7 @@ public class GameOverPanel extends BackgroundPanel {
         });
 
         // Play Again -> reset state, back to host selection
-        playAgainButton = new ImagePanel("/endings/playagain3.png", "playagain3_hover.png");
+        playAgainButton = new ImagePanel("/endings/playagain3.png", "/endings/playagain3_hover.png");
         playAgainButton.setPixelPreciseHitTest(true);
         playAgainButton.setHoverHighlight(true);
         percentLayout.addPixel(this, playAgainButton, 978, 772, 369, 98);

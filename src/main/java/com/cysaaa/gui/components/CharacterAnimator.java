@@ -24,20 +24,32 @@ public class CharacterAnimator {
 
     private final BufferedImage background;
     private final ArrayList<WarpRegion> regions = new ArrayList<>();
+    private final WarpRegion headRegion;
 
     public CharacterAnimator(BufferedImage background) {
         this.background = background;
 
         // x, y, w, h, feather, sway(px), bob(px), speed, phase
-        regions.add(new WarpRegion(1125, 560, 150, 250, 14, 2.5, 1.5, 1.3, 0.0)); // person
-        regions.add(new WarpRegion(1050, 675, 100, 140, 10, 1.5, 0.8, 1.8, 1.0)); // small cat body
-        regions.add(new WarpRegion(1040, 700,  55,  70,  8, 5.0, 0.0, 3.2, 0.5)); // small cat tail
-        regions.add(new WarpRegion(1240, 380, 210, 190, 16, 3.0, 2.5, 0.9, 2.0)); // robot head
-        regions.add(new WarpRegion(1260, 540, 300, 270, 16, 1.0, 1.2, 0.9, 2.0)); // robot body
+        regions.add(new WarpRegion(1125, 560, 150, 250, 14, 5.0, 3.0, 1.4, 0.0)); // person
+        regions.add(new WarpRegion(1050, 675, 100, 140, 10, 3.0, 1.5, 1.8, 1.0)); // small cat body
+        regions.add(new WarpRegion(1040, 700,  55,  70,  8, 9.0, 0.0, 3.5, 0.5)); // small cat tail
+
+        headRegion = new WarpRegion(1240, 380, 210, 190, 16, 5.0, 5.0, 1.0, 2.0);  // robot head
+        regions.add(headRegion);
+
+        regions.add(new WarpRegion(1260, 540, 300, 270, 16, 2.0, 2.5, 1.0, 2.0)); // robot body
     }
 
     public int getWidth()  { return background.getWidth(); }
     public int getHeight() { return background.getHeight(); }
+
+    /**
+     * How far the robot head has moved at image row y: {dx, dy}.
+     * Lets other things (the crows) ride on the head as it bobs and sways.
+     */
+    public double[] headOffset(double t, double y) {
+        return headRegion.offsetAt(t, y);
+    }
 
     /** g must already be scaled so 1 unit = 1 background-image pixel. */
     public void paint(Graphics2D g, double t) {
@@ -126,6 +138,21 @@ public class CharacterAnimator {
 
             scratch = new BufferedImage(
                     w + PAD * 2, h + PAD * 2, BufferedImage.TYPE_INT_ARGB);
+        }
+
+        /** Same maths as paint(), so things can follow this region exactly. */
+        double[] offsetAt(double t, double imageY) {
+
+            double wave  = Math.sin(t * speed + phase);
+            double wave2 = Math.sin(t * speed * 0.5 + phase + 1.3);
+
+            double weight = 1.0 - (imageY - y) / (double) h;
+            weight = Math.max(0, Math.min(1, weight));
+
+            return new double[] {
+                sway * wave * weight * weight,
+                Math.round(-bob * Math.abs(wave2) * weight)
+            };
         }
 
         void paint(Graphics2D g, double t) {

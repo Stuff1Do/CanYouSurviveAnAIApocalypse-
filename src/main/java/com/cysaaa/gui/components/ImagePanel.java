@@ -19,11 +19,8 @@ public class ImagePanel extends JPanel {
     private boolean selected = false;
 
     // Minimum alpha value (0-255) for a pixel to count as "clickable".
-    // Pixels with alpha at or below this are treated as transparent/empty space.
     private static final int ALPHA_THRESHOLD = 10;
 
-    // Set to true to make mouse events only register on non-transparent pixels
-    // of the image, instead of the full rectangular bounds.
     private boolean pixelPreciseHitTest = false;
 
     // Use this constructor if you don't need a hover state
@@ -50,7 +47,7 @@ public class ImagePanel extends JPanel {
             e.printStackTrace();
         }
 
-        setOpaque(false); // transparent parts of the PNG show what's behind it
+        setOpaque(false);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -73,8 +70,6 @@ public class ImagePanel extends JPanel {
         });
     }
 
-    // Call this to change the displayed image after construction
-    // (e.g. progress bar frames, lifeline used/unused states, host-specific icons).
     public void setImage(String imagePath) {
         try {
             URL imgUrl = getClass().getResource(imagePath);
@@ -100,7 +95,6 @@ public class ImagePanel extends JPanel {
     }
 
     // Use this constructor when no image should be shown yet
-    // (e.g. content that gets set immediately after construction via setImage/setActiveImage)
     public ImagePanel() {
         this.image = null;
         this.hoverImage = null;
@@ -122,8 +116,6 @@ public class ImagePanel extends JPanel {
         });
     }
 
-    // Call this to enable shape-accurate (alpha-based) hover/click detection,
-    // so transparent parts of the image no longer respond to mouse events.
     public void setPixelPreciseHitTest(boolean enabled) {
         this.pixelPreciseHitTest = enabled;
     }
@@ -139,15 +131,13 @@ public class ImagePanel extends JPanel {
     @Override
     public boolean contains(int x, int y) {
         if (!pixelPreciseHitTest || image == null) {
-            return super.contains(x, y); // default rectangular hit test
+            return super.contains(x, y);
         }
 
         if (x < 0 || y < 0 || x >= getWidth() || y >= getHeight()) {
             return false;
         }
 
-        // Scale the panel's click coordinates to the image's actual pixel
-        // coordinates, since the image is drawn stretched to the panel's size.
         int imgX = (int) ((double) x / getWidth() * image.getWidth());
         int imgY = (int) ((double) y / getHeight() * image.getHeight());
 
