@@ -382,6 +382,7 @@ public class TApp {
 
 
         if(screenState == GameState.VICTORY){
+            AudioManager.playEffect("win.wav");
             System.out.println("YOU WON!");
         }else if(screenState == GameState.GAME_OVER){
             checkCheckpoint();

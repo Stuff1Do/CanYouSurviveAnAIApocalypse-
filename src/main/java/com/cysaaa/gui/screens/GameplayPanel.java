@@ -403,6 +403,7 @@ public class GameplayPanel extends BackgroundPanel {
 
             if (StateManager.getInstance().getCurrentQuestionNumber() > sortedRandomizedQuestions.size()) {
                 StateManager.getInstance().setScreenState(GameState.VICTORY);
+                AudioManager.playEffect("win.wav");
                 dialogue.type(StateManager.getInstance().getCurrentHost().getLine(StateManager.getInstance().getScreenState()));
                 runAfterDelay(3000, () -> {
                     cardLayout.show(mainPanel, "VICTORY");
