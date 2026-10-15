@@ -1,10 +1,13 @@
 package com.cysaaa.util;
 
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 
@@ -17,6 +20,7 @@ public class DialogueUtil {
 
     private Timer typewriterTimer;
     private String currentFullText = "";
+    private List<String> currentLines = new ArrayList<>(); // currentFullText split into width-fitting lines
 
     // auto-fit font (off unless enableAutoFit is called)
     private boolean autoFit = false;
@@ -53,15 +57,17 @@ public class DialogueUtil {
         if (!autoFit) return;
         String shownText = targetLabel.getText();
 
-        targetLabel.setText(wrapInHtmlTag(applyWordWrap(currentFullText)));
+        // measure with the raw text — the HTML wraps it to the label width on its own
+        targetLabel.setText(wrapInHtmlTag(currentFullText));
         LabelFontFitter.fitToHeight(targetLabel, maxFontSize, minFontSize);
+        currentLines = wrapToLines(currentFullText); // line breaks for the chosen font + width
 
         boolean typing = typewriterTimer != null && typewriterTimer.isRunning();
         if (typing) {
-            targetLabel.setText(shownText); // next tick re-renders with the new width anyway
+            targetLabel.setText(shownText); // next tick re-renders with the new lines anyway
         } else if (!currentFullText.isEmpty()) {
-            // already fully typed — re-render so the div width matches the resized label
-            targetLabel.setText(wrapInHtmlTag(applyWordWrap(currentFullText)));
+            // already fully typed — re-render so the lines match the resized label
+            targetLabel.setText(wrapInHtmlTag(String.join("<br>", currentLines)));
         }
     }
 
@@ -88,19 +94,17 @@ public class DialogueUtil {
         }
 
         currentFullText = fullText;
-        fitToLabel();
+        currentLines = wrapToLines(fullText);
+        fitToLabel(); // picks the font size, then recomputes currentLines for it
         targetLabel.setText(""); // fitToLabel leaves the full line shown; blank it so it doesn't flash before typing
-        String wrappedFullText = applyWordWrap(fullText); // compute line breaks only on completed text
         int[] charIndex = {0};
 
         typewriterTimer = new Timer(millisPerChar, e -> {
             charIndex[0]++;
-            // reveal characters from the WRAPPED text, not the raw text,
-            // so <br> tags are already in fixed positions and won't shift
-            String visiblePortion = wrappedFullText.substring(0, Math.min(charIndex[0], wrappedFullText.length()));
-            targetLabel.setText(wrapInHtmlTag(visiblePortion));
+            // line breaks are decided up front, so a word never jumps to the next line mid-type
+            targetLabel.setText(wrapInHtmlTag(visibleLines(charIndex[0])));
 
-            if (charIndex[0] >= wrappedFullText.length()) {
+            if (charIndex[0] >= totalChars()) {
                 typewriterTimer.stop();
             }
         });
@@ -113,31 +117,66 @@ public class DialogueUtil {
             typewriterTimer.stop();
         }
         currentFullText = "";
+        currentLines = new ArrayList<>();
         targetLabel.setText("");
     }
 
     public void skipToEnd() {
         if (typewriterTimer != null && typewriterTimer.isRunning()) {
             typewriterTimer.stop();
-            targetLabel.setText(wrapInHtmlTag(applyWordWrap(currentFullText)));
+            targetLabel.setText(wrapInHtmlTag(String.join("<br>", currentLines)));
         }
     }
 
-    // Inserts <br> every N words into the raw text
-    private String applyWordWrap(String text) {
-        int wordsPerLine = 4;
-        String[] words = text.split(" ");
-        StringBuilder wrapped = new StringBuilder();
+    // Splits text into lines that fit the label's width at its current font:
+    // keeps adding words to a line until the next word would overflow, then starts a new line.
+    private List<String> wrapToLines(String text) {
+        List<String> lines = new ArrayList<>();
+        if (text == null || text.isEmpty()) return lines;
 
-        for (int i = 0; i < words.length; i++) {
-            wrapped.append(words[i]);
-            if ((i + 1) % wordsPerLine == 0 && i != words.length - 1) {
-                wrapped.append("<br>");
-            } else if (i != words.length - 1) {
-                wrapped.append(" ");
+        FontMetrics fm = targetLabel.getFontMetrics(targetLabel.getFont());
+        // small safety margin so the HTML renderer never re-wraps a line we measured as fitting
+        int maxWidth = (int) (labelInnerWidth() * 0.95);
+
+        StringBuilder line = new StringBuilder();
+        for (String word : text.split(" ")) {
+            if (word.isEmpty()) continue;
+            String candidate = line.length() == 0 ? word : line + " " + word;
+            if (line.length() > 0 && fm.stringWidth(candidate) > maxWidth) {
+                lines.add(line.toString());
+                line = new StringBuilder(word);
+            } else {
+                line = new StringBuilder(candidate);
             }
         }
-        return wrapped.toString();
+        if (line.length() > 0) lines.add(line.toString());
+        return lines;
+    }
+
+    // First `count` characters of currentLines, joined with <br> (never cuts an HTML tag in half)
+    private String visibleLines(int count) {
+        StringBuilder sb = new StringBuilder();
+        int remaining = count;
+        for (int i = 0; i < currentLines.size() && remaining > 0; i++) {
+            String line = currentLines.get(i);
+            if (i > 0) sb.append("<br>");
+            sb.append(line, 0, Math.min(remaining, line.length()));
+            remaining -= line.length();
+        }
+        return sb.toString();
+    }
+
+    private int totalChars() {
+        int total = 0;
+        for (String line : currentLines) total += line.length();
+        return total;
+    }
+
+    // Label width in real screen pixels (falls back to wrapWidth before it's laid out)
+    private int labelInnerWidth() {
+        java.awt.Insets insets = targetLabel.getInsets();
+        int available = targetLabel.getWidth() - insets.left - insets.right;
+        return available > 0 ? available : wrapWidth;
     }
 
     // Swing's HTML renderer (non-W3C mode, which JLabel always uses) draws CSS "px" 1.3x larger
@@ -148,10 +187,7 @@ public class DialogueUtil {
     // and gets clipped when the window is smaller than the design size.
     // Falls back to wrapWidth before the label is laid out.
     private int currentWrapWidth() {
-        java.awt.Insets insets = targetLabel.getInsets();
-        int available = targetLabel.getWidth() - insets.left - insets.right;
-        int screenPx = available > 0 ? available : wrapWidth;
-        return (int) (screenPx / SWING_CSS_PX_SCALE);
+        return (int) (labelInnerWidth() / SWING_CSS_PX_SCALE);
     }
 
     // Just wraps already-formatted text in the html/div container
