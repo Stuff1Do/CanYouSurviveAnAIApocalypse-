@@ -12,6 +12,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -25,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import com.cysaaa.gui.components.*;
+import com.cysaaa.util.AudioManager;
 
 public class SplashScreenPanel extends JPanel {
 
@@ -118,6 +121,14 @@ public class SplashScreenPanel extends JPanel {
         percent.addPixel(layers, loaderOverlay, 0, 0, DESIGN_W, DESIGN_H);
 
         add(layers, BorderLayout.CENTER);
+        AudioManager.playBackground("loadintro.wav");
+
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent event) {
+                AudioManager.playBackground("loadintro.wav");
+            }
+        });
 
         startedAt = System.currentTimeMillis();
         nextFlickerAt = startedAt
