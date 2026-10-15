@@ -486,6 +486,11 @@ public class GameplayPanel extends BackgroundPanel {
     public void startNewGame() {
         StateManager.getInstance().reset();
         loadQuestionList();
+
+        for (Question q : questionList) {
+            q.shuffleChoices(random);    
+        }
+
         randomizeQuestions(questionList);
         sortQuestions(randomizedQuestions);
         loadCurrentQuestion();

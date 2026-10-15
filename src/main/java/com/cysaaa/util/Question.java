@@ -1,4 +1,5 @@
 package com.cysaaa.util;
+import java.util.Random;
 
 /**
  * Question
@@ -53,6 +54,24 @@ public class Question {
 
     public String getHint(){
         return hint;
+    }
+
+    public void shuffleChoices(Random random) {
+
+        for (int i = choices.length - 1; i > 0; i--) {
+
+            int j = random.nextInt(i + 1);   
+
+            String temp = choices[i];
+            choices[i] = choices[j];
+            choices[j] = temp;
+
+            if (correctIndex == i) {
+                correctIndex = j;
+            } else if (correctIndex == j) {
+                correctIndex = i;
+            }
+        }
     }
 
     @Override
